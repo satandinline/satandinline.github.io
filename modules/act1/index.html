@@ -1,0 +1,31 @@
+<div class="hub-spoke-grid">
+    <div class="hub-central-core">
+        <span style="color: var(--text-secondary); font-size: 14px;">清洗后有效专利</span>
+        <div id="metricTotalCount" style="font-size: 48px; font-weight: 700; color: var(--cyan-accent);">0</div>
+        <span id="metricSubDateRange"
+            style="color: var(--text-secondary); font-size: 11px; padding: 0 10px;">统计周期</span>
+    </div>
+    <div class="dashboard-card" style="grid-column: 1; grid-row: 1;">
+        <h3>专利法律审查结构</h3>
+        <div class="canvas-wrapper"><canvas id="chartAct1GrantRate"></canvas></div>
+    </div>
+    <div class="dashboard-card" style="grid-column: 1; grid-row: 2;">
+        <h3>高价值专利资产池</h3>
+        <div style="display: flex; align-items: center; justify-content: space-around; height: 100%;">
+            <div>
+                <div id="metricHighValueCount" style="font-size: 36px; font-weight: 700; color: var(--amber-accent);">0
+                </div>
+                <div id="metricHighValueRatio" style="font-size:12px; color:var(--text-secondary);">占比 --%</div>
+            </div>
+            <div style="width: 120px; height: 120px;"><canvas id="chartAct1HighValueArc"></canvas></div>
+        </div>
+    </div>
+    <div class="dashboard-card" style="grid-column: 3; grid-row: 1;">
+        <h3>技术分支主题分布 (Top 6)</h3>
+        <div class="canvas-wrapper"><canvas id="chartAct1TechRose"></canvas></div>
+    </div>
+    <div class="dashboard-card" style="grid-column: 3; grid-row: 2;">
+        <h3>创新地市排行 TOP 5</h3>
+        <div class="canvas-wrapper"><canvas id="chartAct1CityBar"></canvas></div>
+    </div>
+</div>

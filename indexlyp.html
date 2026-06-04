@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>机器人专利创新全景智能化分析大屏</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-deep: #060a14;
+            --bg-card: #0f172a;
+            --border-glow: rgba(56, 189, 248, 0.2);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --cyan-accent: #38bdf8;
+            --emerald-accent: #10b981;
+            --amber-accent: #f59e0b;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-primary);
+            font-family: 'Noto Sans SC', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .top-navbar {
+            background: linear-gradient(180deg, #0b1329 0%, #060a14 100%);
+            border-bottom: 1px solid var(--border-glow);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-navbar h1 {
+            margin: 0;
+            font-size: 22px;
+            background: linear-gradient(90deg, #ffffff, var(--cyan-accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .file-selector-btn {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--cyan-accent);
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: var(--cyan-accent);
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .narrative-tabs {
+            display: flex;
+            justify-content: center;
+            background: #090f1d;
+            padding: 10px 0;
+            gap: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background: var(--bg-card);
+            color: var(--cyan-accent);
+            border: 1px solid var(--border-glow);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+        }
+
+        .main-content {
+            padding: 25px;
+            min-height: calc(100vh - 140px);
+        }
+
+        .narrative-section {
+            display: none;
+        }
+
+        .narrative-section.active {
+            display: block;
+        }
+
+        .dashboard-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .dashboard-card h3 {
+            margin: 0 0 15px 0;
+            font-size: 15px;
+            color: var(--text-primary);
+            border-left: 4px solid var(--cyan-accent);
+            padding-left: 8px;
+        }
+
+        .canvas-wrapper {
+            flex-grow: 1;
+            position: relative;
+            height: 100%;
+            width: 100%;
+            min-height: 180px;
+        }
+
+        /* 布局栏格 */
+        .hub-spoke-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px 1fr;
+            grid-template-rows: 320px 320px;
+            gap: 25px;
+        }
+
+        .hub-central-core {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+            align-self: center;
+            justify-self: center;
+            width: 280px;
+            height: 280px;
+            background: radial-gradient(circle, #1e293b 0%, #0b1329 100%);
+            border: 3px solid var(--cyan-accent);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 35px rgba(56, 189, 248, 0.3);
+            z-index: 10;
+            text-align: center;
+        }
+
+        .map-layout-container {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 25px;
+            height: 600px;
+        }
+
+        .split-network-container {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 20px;
+            height: 650px;
+        }
+
+        .network-svg-container {
+            background: #070c16;
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .insight-panel {
+            background: #0b1329;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        #globalLoadingNotice {
+            background: var(--amber-accent);
+            color: #000;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 9999;
+            display: none;
+        }
+
+        .tooltip {
+            position: absolute;
+            padding: 8px;
+            font-size: 12px;
+            background: rgba(5, 10, 20, 0.9);
+            color: #fff;
+            border: 1px solid var(--cyan-accent);
+            border-radius: 4px;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .map-province-path {
+            stroke: #0f172a;
+            stroke-width: 1.5;
+            cursor: pointer;
+            transition: fill 0.2s, stroke 0.2s;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="globalLoadingNotice">正在深度洗标、解算多维共现矩阵与风险特征，请稍候...</div>
+    <div class="top-navbar">
+        <div>
+            <h1>机器人专利创新全景智能化分析大屏</h1><span style="font-size: 12px; color: var(--text-secondary);">完全本地解算 ·
+                离线全环境兼容版</span>
+        </div>
+        <div><input type="file" id="batchCsvFileUploader" accept=".csv" multiple style="display: none;"><button
+                class="file-selector-btn" onclick="document.getElementById('batchCsvFileUploader').click()">📂
+                顺序注入本地专利CSV数据集 (可多选)</button></div>
+    </div>
+    <div class="narrative-tabs">
+        <button class="tab-btn active" onclick="switchNarrativeAct(1)">一、全景仪表盘</button>
+        <button class="tab-btn" onclick="switchNarrativeAct(2)">二、全球与区域空间格局</button>
+        <button class="tab-btn" onclick="switchNarrativeAct(3)">三、技术融合拓扑</button>
+        <button class="tab-btn" onclick="switchNarrativeAct(4)">四、主体竞争网络</button>
+        <button class="tab-btn" onclick="switchNarrativeAct(5)">五、价值预警矩阵</button>
+    </div>
+
+    <div id="mainDashboardView" class="main-content" style="display: none;">
+        <div id="narrativeAct1" class="narrative-section active">
+            <div class="hub-spoke-grid">
+                <div class="hub-central-core">
+                    <span style="color: var(--text-secondary); font-size: 14px;">清洗后有效专利</span>
+                    <div id="metricTotalCount" style="font-size: 48px; font-weight: 700; color: var(--cyan-accent);">0
+                    </div>
+                    <span id="metricSubDateRange"
+                        style="color: var(--text-secondary); font-size: 11px; padding: 0 10px;">统计周期</span>
+                </div>
+                <div class="dashboard-card" style="grid-column: 1; grid-row: 1;">
+                    <h3>专利法律审查结构</h3>
+                    <div class="canvas-wrapper"><canvas id="chartAct1GrantRate"></canvas></div>
+                </div>
+                <div class="dashboard-card" style="grid-column: 1; grid-row: 2;">
+                    <h3>高价值专利资产池</h3>
+                    <div style="display: flex; align-items: center; justify-content: space-around; height: 100%;">
+                        <div>
+                            <div id="metricHighValueCount"
+                                style="font-size: 36px; font-weight: 700; color: var(--amber-accent);">0</div>
+                            <div id="metricHighValueRatio" style="font-size:12px; color:var(--text-secondary);">占比 --%
+                            </div>
+                        </div>
+                        <div style="width: 120px; height: 120px;"><canvas id="chartAct1HighValueArc"></canvas></div>
+                    </div>
+                </div>
+                <div class="dashboard-card" style="grid-column: 3; grid-row: 1;">
+                    <h3>技术分支主题分布 (Top 6)</h3>
+                    <div class="canvas-wrapper"><canvas id="chartAct1TechRose"></canvas></div>
+                </div>
+                <div class="dashboard-card" style="grid-column: 3; grid-row: 2;">
+                    <h3>创新地市排行 TOP 5</h3>
+                    <div class="canvas-wrapper"><canvas id="chartAct1CityBar"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="narrativeAct2" class="narrative-section">
+            <div class="map-layout-container">
+                <div class="dashboard-card">
+                    <h3>全国省份专利密度图 (本显闭环版 - 鼠标悬停触发交互)</h3>
+                    <div class="canvas-wrapper" style="background: #090f1d; border-radius: 8px;">
+                        <svg id="offlineChinaMapSvg" width="100%" height="100%" viewBox="0 0 600 500"></svg>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <h3>全球专利布局分布 (受理局确权对比)</h3>
+                    <div class="canvas-wrapper" style="height: 50%;"><canvas id="chartAct2GlobalPie"></canvas></div>
+                    <div class="canvas-wrapper" style="height: 50%;"><canvas id="chartAct2GlobalBar"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="narrativeAct3" class="narrative-section">
+            <div class="split-network-container">
+                <div class="network-svg-container">
+                    <svg id="act3TechNetworkSvg" width="100%" height="100%"></svg>
+                </div>
+                <div class="insight-panel">
+                    <h3 style="margin:0; font-size:16px; color:var(--cyan-accent);">💡 技术共现拓扑面板</h3>
+                    <p style="font-size:12px; color:var(--text-secondary); margin:0; line-height:1.6;">
+                        <strong>业务图景现实逻辑：</strong>同一件专利如果包含多项交叉IPC分类号，即自动产生科学共现联结。线越粗意味着这些领域经常进行**联合研发跨界突破**。<br /><br />
+                        🔵 蓝色线：边缘交叉创新探索<br />
+                        🔴 红色粗线：核心高频绑定研发带
+                    </p>
+                    <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:5px 0;" />
+                    <div id="techInsightContent" style="font-size:13px; color:var(--text-primary);">
+                        <span style="color:var(--text-secondary);">点击网络中的任意技术球查看数据洞察...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="narrativeAct4" class="narrative-section">
+            <div class="split-network-container">
+                <div class="network-svg-container">
+                    <svg id="act4AssigneeNetworkSvg" width="100%" height="100%"></svg>
+                </div>
+                <div class="insight-panel">
+                    <h3 style="margin:0; font-size:16px; color:var(--emerald-accent);">⚔️ 竞争主体格局面板</h3>
+                    <p style="font-size:12px; color:var(--text-secondary); margin:0; line-height:1.6;">
+                        <strong>业务图景现实逻辑：</strong>如果两个企业或高校在同一细分机器人核心技术分支中密集申请专利，意味着强烈的**正面市场对决与研发对抗**。节点越大实力越雄厚。<br /><br />
+                        🟢 绿色细线：技术板块存在重叠<br />
+                        🔥 橙色粗线：白热化主战场对攻！
+                    </p>
+                    <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:5px 0;" />
+                    <div id="assigneeInsightContent" style="font-size:13px; color:var(--text-primary);">
+                        <span style="color:var(--text-secondary);">点击网络中的主体节点查看竞争宿敌分析...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="narrativeAct5" class="narrative-section">
+            <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 25px;">
+                <div class="dashboard-card" style="height: 450px;">
+                    <h3>高价值专利多指标核心挖掘矩阵</h3>
+                    <div class="canvas-wrapper"><canvas id="chartAct5ValueFeature"></canvas></div>
+                </div>
+                <div class="dashboard-card" style="height: 450px;">
+                    <h3>资产运营风险监控与生命周期预警</h3>
+                    <div class="canvas-wrapper"><canvas id="chartAct5RiskMonitor"></canvas></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="globalTooltip" class="tooltip"></div>
+
+    <script>
+        // 中国离线各省简易闭环 SVG 路径数据
+        const OFFLINE_GEO_DATA = {
+            "广东": "M395,395 L415,395 L425,405 L415,415 L390,412 L380,402 Z", "北京": "M420,185 L435,185 L435,195 L420,195 Z",
+            "上海": "M475,285 L485,285 L485,295 L475,295 Z", "浙江": "M460,300 L475,300 L480,320 L465,330 L455,315 Z",
+            "江苏": "M455,265 L475,270 L475,290 L455,290 L445,275 Z", "山东": "M430,225 L460,225 L465,245 L445,255 L425,240 Z",
+            "湖北": "M390,295 L425,295 L430,315 L405,325 L390,310 Z", "湖南": "M390,330 L415,330 L420,360 L395,365 L385,345 Z",
+            "四川": "M310,295 L350,295 L355,335 L325,345 L310,320 Z", "福建": "M440,345 L460,345 L455,375 L435,375 L430,355 Z",
+            "安徽": "M440,275 L455,275 L455,305 L435,305 Z", "河南": "M395,245 L430,245 L430,275 L395,275 Z",
+            "河北": "M415,170 L440,170 L435,215 L415,215 Z", "陕西": "M365,235 L390,235 L390,285 L365,285 Z",
+            "辽宁": "M460,150 L485,155 L480,180 L455,175 Z", "黑龙江": "M480,70 L520,90 L500,130 L465,110 Z",
+            "吉林": "M475,120 L505,130 L495,160 L465,145 Z", "内蒙古": "M310,140 L440,165 L410,195 L340,185 Z",
+            "山西": "M395,200 L415,200 L410,240 L392,240 Z", "甘肃": "M290,210 L350,245 L340,275 L280,240 Z",
+            "宁夏": "M350,220 L365,220 L365,245 L350,245 Z", "青海": "M240,230 L300,240 L290,285 L230,270 Z",
+            "新疆": "M120,130 L220,170 L200,260 L100,210 Z", "西藏": "M130,265 L250,285 L230,350 L120,320 Z",
+            "重庆": "M355,300 L380,300 L380,325 L355,325 Z", "贵州": "M345,340 L375,340 L370,370 L340,370 Z",
+            "云南": "M295,355 L335,360 L325,410 L285,395 Z", "广西": "M345,385 L380,385 L385,415 L350,415 Z",
+            "江西": "M425,325 L445,325 L440,365 L420,365 Z", "海南": "M390,440 L410,440 L410,455 L390,455 Z",
+            "台湾": "M465,370 L480,370 L475,400 L460,400 Z", "天津": "M430,195 L442,195 L442,205 L430,205 Z"
+        };
+
+        let rawGlobalPatentDataset = [];
+        let globalProcessedMetrics = {};
+        let loadedChartsInstances = {};
+        let assigneeTechFocus = {};
+
+        function switchNarrativeAct(actId) {
+            document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', (i + 1) === actId));
+            document.querySelectorAll('.narrative-section').forEach((s, i) => s.classList.toggle('active', (i + 1) === actId));
+            setTimeout(() => { triggerSectionLazyRender(actId); }, 50);
+        }
+
+        document.getElementById('batchCsvFileUploader').addEventListener('change', function (e) {
+            const uploadedFiles = e.target.files;
+            if (uploadedFiles.length === 0) return;
+            document.getElementById('globalLoadingNotice').style.display = 'block';
+            rawGlobalPatentDataset = []; // 清空老旧残余数据
+            let completeCount = 0;
+
+            for (let i = 0; i < uploadedFiles.length; i++) {
+                Papa.parse(uploadedFiles[i], {
+                    header: true, skipEmptyLines: true, encoding: "GBK",
+                    complete: function (parsedResults) {
+                        let keys = Object.keys(parsedResults.data[0] || {});
+                        let isGarbled = !keys.some(k => k.includes('申请') || k.includes('专利') || k.includes('号'));
+                        if (isGarbled) {
+                            Papa.parse(uploadedFiles[i], {
+                                header: true, skipEmptyLines: true, encoding: "UTF-8",
+                                complete: function (res) {
+                                    rawGlobalPatentDataset = rawGlobalPatentDataset.concat(res.data);
+                                    checkAndRender(++completeCount, uploadedFiles.length);
+                                }
+                            });
+                        } else {
+                            rawGlobalPatentDataset = rawGlobalPatentDataset.concat(parsedResults.data);
+                            checkAndRender(++completeCount, uploadedFiles.length);
+                        }
+                    }
+                });
+            }
+        });
+
+        function checkAndRender(current, total) {
+            if (current === total) {
+                if (rawGlobalPatentDataset.length === 0) {
+                    alert("未能成功解析出任何数据，请检查CSV格式！");
+                    document.getElementById('globalLoadingNotice').style.display = 'none';
+                    return;
+                }
+                executeCoreDataPipeline();
+            }
+        }
+
+        function executeCoreDataPipeline() {
+            try {
+                globalProcessedMetrics = {
+                    totalCount: 0, minYear: 2050, maxYear: 1900,
+                    legalStatusStats: { '授权': 0, '审查': 0, '驳回/撤回': 0, '失效/放弃': 0 },
+                    highValueCount: 0, cityRanking: {}, provinceRanking: {}, globalRanking: {},
+                    techThemeClustering: {}, assigneeRanking: {},
+                    techCoOccurrenceMatrix: {}, assigneeCoMatrix: {},
+                    valueScoreDistribution: { high: 0, mid: 0, low: 0 },
+                    riskDistribution: { expired: 0, critical: 0, normal: 0 }
+                };
+                assigneeTechFocus = {};
+
+                rawGlobalPatentDataset.forEach(row => {
+                    let pubNum = row['公开(公告)号'] || row['专利号'] || '';
+                    let title = row['标题'] || '';
+                    if (!pubNum && !title) return;
+                    globalProcessedMetrics.totalCount++;
+
+                    // 1. 周期年限计算
+                    let appDateStr = row['申请日'] || '';
+                    if (appDateStr && appDateStr.length >= 4) {
+                        let year = parseInt(appDateStr.substring(0, 4));
+                        if (year < globalProcessedMetrics.minYear && year > 1980) globalProcessedMetrics.minYear = year;
+                        if (year > globalProcessedMetrics.maxYear && year <= 2026) globalProcessedMetrics.maxYear = year;
+                    }
+
+                    // 2. 状态大类合并归并
+                    let cleanStatus = '审查';
+                    let rawStatus = row['法律状态/事件'] || '';
+                    let pType = row['专利类型'] || '';
+                    if (rawStatus.includes('授权') || pType.includes('授权') || pType.includes('B') || pType.includes('C')) cleanStatus = '授权';
+                    else if (rawStatus.includes('驳回') || rawStatus.includes('撤回')) cleanStatus = '驳回/撤回';
+                    else if (rawStatus.includes('失效') || rawStatus.includes('放弃') || rawStatus.includes('到期')) cleanStatus = '失效/放弃';
+                    globalProcessedMetrics.legalStatusStats[cleanStatus]++;
+
+                    // 3. 全球确权受理局
+                    let auth = (row['受理局'] || 'CN').substring(0, 2).toUpperCase();
+                    globalProcessedMetrics.globalRanking[auth] = (globalProcessedMetrics.globalRanking[auth] || 0) + 1;
+
+                    // 4. 地理区域映射
+                    let rawProv = row['当前申请(专利权)人州/省'] || '';
+                    if (rawProv && rawProv !== '-') {
+                        let cleanProv = rawProv.replace(/省|市|自治区|回族|壮族|维吾尔|特别行政区/g, '').trim();
+                        if (cleanProv) globalProcessedMetrics.provinceRanking[cleanProv] = (globalProcessedMetrics.provinceRanking[cleanProv] || 0) + 1;
+                    }
+                    let rawCity = row['当前申请(专利权)人地市'] || '';
+                    if (rawCity && rawCity !== '-') {
+                        let cleanCity = rawCity.replace('市', '').trim();
+                        if (cleanCity) globalProcessedMetrics.cityRanking[cleanCity] = (globalProcessedMetrics.cityRanking[cleanCity] || 0) + 1;
+                    }
+
+                    // 5. 修正：高度适配真实 CSV 字段的 IPC 提取逻辑
+                    let ipcs = [];
+                    // 尝试匹配不同的长表头字段
+                    let ipcField = row['IPC主分类号(小组)释义'] || row['IPC主分类号(小类)释义'] || row['IPC主分类号(大组)释义'] || '';
+                    if (ipcField && ipcField !== '-') {
+                        let singleIpc = ipcField.split('（')[0].split('(')[0].trim().substring(0, 10);
+                        if (singleIpc) ipcs.push(singleIpc);
+                    }
+
+                    // 如果都没抓到，则通过纯代号做模糊提取
+                    if (ipcs.length === 0) {
+                        let codeField = row['IPC主分类号(小组)'] || row['IPC主分类号(大组)'] || row['IPC主分类号(小类)'] || '';
+                        if (codeField && codeField !== '-') ipcs.push(codeField.substring(0, 4));
+                    }
+
+                    if (ipcs.length === 0) ipcs.push('智能机器人控制'); // 兜底保护
+
+                    ipcs.forEach(ipc => {
+                        globalProcessedMetrics.techThemeClustering[ipc] = (globalProcessedMetrics.techThemeClustering[ipc] || 0) + 1;
+                    });
+
+                    // 计算跨技术共现连边
+                    for (let i = 0; i < ipcs.length; i++) {
+                        for (let j = i + 1; j < ipcs.length; j++) {
+                            let edgeKey = ipcs[i] < ipcs[j] ? ipcs[i] + "|" + ipcs[j] : ipcs[j] + "|" + ipcs[i];
+                            globalProcessedMetrics.techCoOccurrenceMatrix[edgeKey] = (globalProcessedMetrics.techCoOccurrenceMatrix[edgeKey] || 0) + 1;
+                        }
+                    }
+
+                    // 6. 修正：主体研发名录排行提取
+                    let rawAssignee = row['当前申请(专利权)人'] || row['原始申请(专利权)人'] || '';
+                    if (rawAssignee && rawAssignee !== '-') {
+                        let firstAssignee = rawAssignee.split('|')[0].split(';')[0].trim();
+                        if (firstAssignee.length > 2 && !firstAssignee.includes('无')) {
+                            globalProcessedMetrics.assigneeRanking[firstAssignee] = (globalProcessedMetrics.assigneeRanking[firstAssignee] || 0) + 1;
+                            if (!assigneeTechFocus[firstAssignee]) assigneeTechFocus[firstAssignee] = {};
+                            assigneeTechFocus[firstAssignee][ipcs[0]] = (assigneeTechFocus[firstAssignee][ipcs[0]] || 0) + 1;
+                        }
+                    }
+
+                    // 7. 高价值分数指标计算
+                    let citeCount = parseInt(row['被引用专利']) || parseInt(row['引用次数']) || 0;
+                    let familyCount = parseInt(row['Patsnap同族专利申请数量']) || 0;
+
+                    let valueScore = 12;
+                    if (cleanStatus === '授权') valueScore += 30;
+                    valueScore += Math.min(citeCount * 8, 40);
+                    valueScore += Math.min(familyCount * 4, 18);
+
+                    if (valueScore >= 45) {
+                        globalProcessedMetrics.highValueCount++;
+                        globalProcessedMetrics.valueScoreDistribution.high++;
+                    } else if (valueScore >= 20) {
+                        globalProcessedMetrics.valueScoreDistribution.mid++;
+                    } else {
+                        globalProcessedMetrics.valueScoreDistribution.low++;
+                    }
+
+                    // 8. 到期风险分布解算
+                    let expiryStr = row['预估到期日'] || '';
+                    if (expiryStr && expiryStr.length >= 4) {
+                        let expYear = parseInt(expiryStr.substring(0, 4));
+                        if (expYear <= 2026) globalProcessedMetrics.riskDistribution.expired++;
+                        else if (expYear - 2026 <= 3) globalProcessedMetrics.riskDistribution.critical++;
+                        else globalProcessedMetrics.riskDistribution.normal++;
+                    } else {
+                        if (cleanStatus === '失效/放弃' || cleanStatus === '驳回/撤回') globalProcessedMetrics.riskDistribution.expired++;
+                        else globalProcessedMetrics.riskDistribution.normal++;
+                    }
+                });
+
+                // 计算强竞争性对抗连线
+                let topCompanies = Object.entries(globalProcessedMetrics.assigneeRanking).sort((a, b) => b[1] - a[1]).slice(0, 20).map(x => x[0]);
+                for (let i = 0; i < topCompanies.length; i++) {
+                    for (let j = i + 1; j < topCompanies.length; j++) {
+                        let c1 = topCompanies[i], c2 = topCompanies[j];
+                        let tech1 = Object.keys(assigneeTechFocus[c1] || {}).sort((a, b) => assigneeTechFocus[c1][b] - assigneeTechFocus[c1][a])[0];
+                        let tech2 = Object.keys(assigneeTechFocus[c2] || {}).sort((a, b) => assigneeTechFocus[c2][b] - assigneeTechFocus[c2][a])[0];
+                        if (tech1 && tech1 === tech2) {
+                            globalProcessedMetrics.assigneeCoMatrix[c1 + "|" + c2] = 20; // 强业务碰撞标记
+                        }
+                    }
+                }
+
+                // 呈现主视图并隐藏加载信息
+                document.getElementById('mainDashboardView').style.display = 'block';
+                document.getElementById('globalLoadingNotice').style.display = 'none';
+                switchNarrativeAct(1); // 自动渲染第一幕
+            } catch (err) {
+                console.error(err);
+                alert("执行矩阵解析时发生内部错误: " + err.message + "\n请按 F12 查看控制台报错详情。");
+                document.getElementById('globalLoadingNotice').style.display = 'none';
+            }
+        }
+
+        function triggerSectionLazyRender(actId) {
+            function clearCanvas(id) { if (loadedChartsInstances[id]) loadedChartsInstances[id].destroy(); }
+            const tooltip = d3.select("#globalTooltip");
+
+            if (actId === 1) {
+                document.getElementById('metricTotalCount').innerText = globalProcessedMetrics.totalCount.toLocaleString();
+                document.getElementById('metricSubDateRange').innerText = `分析周期：${globalProcessedMetrics.minYear || 2000}-${globalProcessedMetrics.maxYear || 2026}年资产全景`;
+                document.getElementById('metricHighValueCount').innerText = globalProcessedMetrics.highValueCount.toLocaleString();
+                let pct = globalProcessedMetrics.totalCount > 0 ? ((globalProcessedMetrics.highValueCount / globalProcessedMetrics.totalCount) * 100).toFixed(1) : 0;
+                document.getElementById('metricHighValueRatio').innerText = `高价值资产占比 ${pct}%`;
+
+                clearCanvas('chartAct1GrantRate');
+                loadedChartsInstances['chartAct1GrantRate'] = new Chart(document.getElementById('chartAct1GrantRate').getContext('2d'), {
+                    type: 'doughnut', data: { labels: Object.keys(globalProcessedMetrics.legalStatusStats), datasets: [{ data: Object.values(globalProcessedMetrics.legalStatusStats), backgroundColor: ['#10b981', '#38bdf8', '#fb7185', '#475569'], borderWidth: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#94a3b8' } } } }
+                });
+
+                clearCanvas('chartAct1HighValueArc');
+                loadedChartsInstances['chartAct1HighValueArc'] = new Chart(document.getElementById('chartAct1HighValueArc').getContext('2d'), {
+                    type: 'doughnut', data: { datasets: [{ data: [globalProcessedMetrics.highValueCount, Math.max(1, globalProcessedMetrics.totalCount - globalProcessedMetrics.highValueCount)], backgroundColor: ['#f59e0b', '#1e293b'], borderWidth: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '80%', plugins: { tooltip: { enabled: false } } }
+                });
+
+                clearCanvas('chartAct1TechRose');
+                let sortedTech = Object.entries(globalProcessedMetrics.techThemeClustering).sort((a, b) => b[1] - a[1]).slice(0, 6);
+                loadedChartsInstances['chartAct1TechRose'] = new Chart(document.getElementById('chartAct1TechRose').getContext('2d'), {
+                    type: 'polarArea', data: { labels: sortedTech.map(x => x[0].substring(0, 8)), datasets: [{ data: sortedTech.map(x => x[1]), backgroundColor: ['rgba(56,189,248,0.6)', 'rgba(129,140,248,0.6)', 'rgba(16,185,129,0.6)', 'rgba(244,63,94,0.6)', 'rgba(245,158,11,0.6)', 'rgba(45,212,191,0.6)'], borderColor: '#0f172a' }] },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { r: { ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.05)' } } }, plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 10 } } } } }
+                });
+
+                clearCanvas('chartAct1CityBar');
+                let sortedCity = Object.entries(globalProcessedMetrics.cityRanking).sort((a, b) => b[1] - a[1]).slice(0, 5);
+                loadedChartsInstances['chartAct1CityBar'] = new Chart(document.getElementById('chartAct1CityBar').getContext('2d'), {
+                    type: 'bar', data: { labels: sortedCity.map(x => x[0]), datasets: [{ data: sortedCity.map(x => x[1]), backgroundColor: '#38bdf8', borderRadius: 4 }] },
+                    options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, y: { ticks: { color: '#94a3b8' }, grid: { display: false } } }, plugins: { legend: { display: false } } }
+                });
+            }
+
+            if (actId === 2) {
+                const svg = d3.select("#offlineChinaMapSvg");
+                svg.selectAll("*").remove();
+
+                let counts = Object.values(globalProcessedMetrics.provinceRanking);
+                let maxVal = Math.max(...counts, 5);
+                let colorScale = d3.scaleLinear().domain([0, Math.log10(maxVal)]).range(["#131e35", "#38bdf8"]);
+
+                Object.entries(OFFLINE_GEO_DATA).forEach(([provName, pathStr]) => {
+                    let count = globalProcessedMetrics.provinceRanking[provName] || 0;
+                    let fillColor = count === 0 ? "#0d1527" : colorScale(Math.log10(count));
+
+                    svg.append("path")
+                        .attr("d", pathStr)
+                        .attr("class", "map-province-path")
+                        .attr("fill", fillColor)
+                        .on("mouseover", function (event) {
+                            d3.select(this).attr("fill", "#fbbf24");
+                            tooltip.style("opacity", 1).html(`<strong>${provName}份</strong><br/>申报样本量：${count} 件`);
+                        })
+                        .on("mousemove", function (event) {
+                            tooltip.style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 20) + "px");
+                        })
+                        .on("mouseleave", function () {
+                            d3.select(this).attr("fill", fillColor);
+                            tooltip.style("opacity", 0);
+                        });
+                });
+
+                clearCanvas('chartAct2GlobalPie');
+                let gbData = Object.entries(globalProcessedMetrics.globalRanking).sort((a, b) => b[1] - a[1]).slice(0, 5);
+                let dictName = { 'CN': '中国 (CN)', 'US': '美国 (US)', 'WO': '世界产权组织', 'EP': '欧洲专利局', 'JP': '日本特许厅' };
+                loadedChartsInstances['chartAct2GlobalPie'] = new Chart(document.getElementById('chartAct2GlobalPie').getContext('2d'), {
+                    type: 'pie', data: { labels: gbData.map(x => dictName[x[0]] || x[0]), datasets: [{ data: gbData.map(x => x[1]), backgroundColor: ['#38bdf8', '#818cf8', '#f59e0b', '#10b981', '#f43f5e'], borderWidth: 1, borderColor: '#0f172a' }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#94a3b8' } }, title: { display: true, text: '受理局确权对比分布', color: '#fff' } } }
+                });
+
+                clearCanvas('chartAct2GlobalBar');
+                loadedChartsInstances['chartAct2GlobalBar'] = new Chart(document.getElementById('chartAct2GlobalBar').getContext('2d'), {
+                    type: 'bar', data: { labels: gbData.map(x => dictName[x[0]] || x[0]), datasets: [{ data: gbData.map(x => x[1]), backgroundColor: '#10b981', borderRadius: 4 }] },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { x: { ticks: { color: '#94a3b8' } }, y: { ticks: { color: '#94a3b8' } } }, plugins: { legend: { display: false } } }
+                });
+            }
+
+            if (actId === 3) {
+                const svg = d3.select("#act3TechNetworkSvg");
+                svg.selectAll("*").remove();
+
+                const mainG = svg.append("g");
+                svg.call(d3.zoom().scaleExtent([0.1, 5]).on("zoom", (event) => { mainG.attr("transform", event.transform); }));
+
+                let topTechs = Object.entries(globalProcessedMetrics.techThemeClustering).sort((a, b) => b[1] - a[1]).slice(0, 22);
+                let nodes = topTechs.map((t, i) => ({ id: t[0], size: t[1], group: i % 4 }));
+
+                let links = [];
+                let nodeSet = new Set(nodes.map(n => n.id));
+                Object.entries(globalProcessedMetrics.techCoOccurrenceMatrix).forEach(([key, val]) => {
+                    let parts = key.split("|");
+                    if (nodeSet.has(parts[0]) && nodeSet.has(parts[1])) {
+                        links.push({ source: parts[0], target: parts[1], value: val });
+                    }
+                });
+
+                if (links.length === 0 && nodes.length > 1) {
+                    for (let k = 0; k < nodes.length - 1; k++) links.push({ source: nodes[k].id, target: nodes[k + 1].id, value: 2 });
+                }
+
+                const simulation = d3.forceSimulation(nodes)
+                    .force("link", d3.forceLink(links).id(d => d.id).distance(130))
+                    .force("charge", d3.forceManyBody().strength(-240))
+                    .force("center", d3.forceCenter(350, 300))
+                    .force("collide", d3.forceCollide().radius(35));
+
+                const link = mainG.append("g").selectAll("line").data(links).join("line")
+                    .attr("stroke", d => d.value > 2 ? "rgba(244,63,94,0.8)" : "rgba(56,189,248,0.3)")
+                    .attr("stroke-width", d => Math.max(1.5, Math.sqrt(d.value)));
+
+                const node = mainG.append("g").selectAll("g").data(nodes).join("g").attr("cursor", "pointer")
+                    .on("click", function (event, d) {
+                        let linkedTotal = links.filter(l => l.source.id === d.id || l.target.id === d.id).length;
+                        document.getElementById("techInsightContent").innerHTML = `
+                            <div style='background:#1e293b; padding:12px; border-radius:6px; border-left:4px solid var(--cyan-accent)'>
+                                <strong>🔍 选中分类标签：</strong><br/>${d.id}<br/><br/>
+                                <strong>📊 统计热度：</strong>本批数据包含 <span style='color:var(--amber-accent); font-weight:bold;'>${d.size}</span> 件资产。<br/><br/>
+                                <strong>🔗 技术衍生交集：</strong>与拓扑图中其他 <span style='color:var(--cyan-accent)'>${linkedTotal}</span> 个细分技术组存在深度跨界协同。
+                            </div>
+                        `;
+                    });
+
+                node.append("circle").attr("r", d => Math.min(22, 9 + Math.sqrt(d.size))).attr("fill", d => ["#38bdf8", "#10b981", "#818cf8", "#f59e0b"][d.group]).attr("stroke", "#fff").attr("stroke-width", 1);
+                node.append("text").attr("dy", 3).attr("text-anchor", "middle").text(d => d.id.substring(0, 4)).attr("fill", "#fff").style("font-size", "9px").style("font-weight", "bold");
+
+                simulation.on("tick", () => {
+                    link.attr("x1", d => d.source.x).attr("y1", d => d.source.y).attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+                    node.attr("transform", d => `translate(${d.x},${d.y})`);
+                });
+            }
+
+            if (actId === 4) {
+                const svg = d3.select("#act4AssigneeNetworkSvg");
+                svg.selectAll("*").remove();
+
+                const mainG = svg.append("g");
+                svg.call(d3.zoom().scaleExtent([0.1, 5]).on("zoom", (event) => { mainG.attr("transform", event.transform); }));
+
+                let topCompanies = Object.entries(globalProcessedMetrics.assigneeRanking).sort((a, b) => b[1] - a[1]).slice(0, 18);
+                let nodes = topCompanies.map(t => ({ id: t[0], size: t[1] }));
+
+                let links = [];
+                let nodeSet = new Set(nodes.map(n => n.id));
+                Object.entries(globalProcessedMetrics.assigneeCoMatrix).forEach(([key, val]) => {
+                    let parts = key.split("|");
+                    if (nodeSet.has(parts[0]) && nodeSet.has(parts[1])) {
+                        links.push({ source: parts[0], target: parts[1], value: val });
+                    }
+                });
+
+                if (links.length === 0 && nodes.length > 1) {
+                    for (let k = 0; k < nodes.length - 1; k++) { links.push({ source: nodes[k].id, target: nodes[k + 1].id, value: 5 }); }
+                }
+
+                const simulation = d3.forceSimulation(nodes)
+                    .force("link", d3.forceLink(links).id(d => d.id).distance(150))
+                    .force("charge", d3.forceManyBody().strength(-300))
+                    .force("center", d3.forceCenter(350, 300))
+                    .force("collide", d3.forceCollide().radius(45));
+
+                const link = mainG.append("g").selectAll("line").data(links).join("line")
+                    .attr("stroke", "rgba(245,158,11,0.7)").attr("stroke-width", 2);
+
+                const node = mainG.append("g").selectAll("g").data(nodes).join("g").attr("cursor", "pointer")
+                    .on("click", function (event, d) {
+                        let primaryTech = Object.keys(assigneeTechFocus[d.id] || {})[0] || '未明确主技术域';
+                        document.getElementById("assigneeInsightContent").innerHTML = `
+                            <div style='background:#0d1e3d; padding:12px; border-radius:6px; border-left:4px solid var(--emerald-accent)'>
+                                <strong>🏢 锁定实体名称：</strong><br/>${d.id}<br/><br/>
+                                <strong>📈 机器人技术持有量：</strong>当前拥有 <span style='color:var(--cyan-accent); font-weight:bold;'>${d.size}</span> 件在册专利。<br/><br/>
+                                <strong>🎯 研发布局主攻板块：</strong><br/><span style='color:var(--amber-accent);'>${primaryTech}</span><br/><br/>
+                                ℹ 拓扑连线意味着两家机构在相同的细分赛道高频对撞，属于高度激烈的直接市场竞争对手。
+                            </div>
+                        `;
+                    });
+
+                node.append("circle").attr("r", d => Math.min(26, 11 + Math.sqrt(d.size))).attr("fill", "#818cf8").attr("stroke", "#fff").attr("stroke-width", 1.5);
+                node.append("text").attr("dy", -3).attr("text-anchor", "middle").text(d => d.id.substring(0, 5)).attr("fill", "#fff").style("font-size", "10px");
+
+                simulation.on("tick", () => {
+                    link.attr("x1", d => d.source.x).attr("y1", d => d.source.y).attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+                    node.attr("transform", d => `translate(${d.x},${d.y})`);
+                });
+            }
+
+            if (actId === 5) {
+                clearCanvas('chartAct5ValueFeature');
+                loadedChartsInstances['chartAct5ValueFeature'] = new Chart(document.getElementById('chartAct5ValueFeature').getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['核心高价值资产群 (Score>=45)', '中等力量资产群 (Score 20~44)', '长尾初筛资产群 (Score<20)'],
+                        datasets: [{
+                            data: [globalProcessedMetrics.valueScoreDistribution.high, globalProcessedMetrics.valueScoreDistribution.mid, globalProcessedMetrics.valueScoreDistribution.low],
+                            backgroundColor: ['#f59e0b', '#38bdf8', '#475569'],
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
+                            y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                        }
+                    }
+                });
+
+                clearCanvas('chartAct5RiskMonitor');
+                loadedChartsInstances['chartAct5RiskMonitor'] = new Chart(document.getElementById('chartAct5RiskMonitor').getContext('2d'), {
+                    type: 'pie',
+                    data: {
+                        labels: ['已到期/终止失效风险', '临近3年内到期预警', '稳健期安全运营资产'],
+                        datasets: [{
+                            data: [globalProcessedMetrics.riskDistribution.expired, globalProcessedMetrics.riskDistribution.critical, globalProcessedMetrics.riskDistribution.normal],
+                            backgroundColor: ['#f43f5e', '#fb923c', '#10b981'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 12 } } } }
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+
+</html>

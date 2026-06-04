@@ -1,0 +1,147 @@
+// 主体竞争网络模块（完全自包含）
+window.act4Module = {
+// 模块私有：力导向图模拟实例
+simulation: null,
+
+// 模块初始化入口
+init(options) {
+const { globalData, assigneeTechFocus, globalTooltip } = options;
+this._renderAssigneeNetwork(globalData, assigneeTechFocus, globalTooltip);
+},
+
+// 模块销毁：清理所有本模块创建的资源
+destroy() {
+if (this.simulation) {
+this.simulation.stop();
+this.simulation = null;
+}
+d3.select("#act4AssigneeNetworkSvg").selectAll("*").remove();
+},
+
+// 私有方法：渲染主体竞争网络
+_renderAssigneeNetwork(globalData, assigneeTechFocus, tooltip) {
+const svg = d3.select("#act4AssigneeNetworkSvg");
+svg.selectAll("*").remove();
+
+// 修复：显式设置SVG宽高，解决节点挤在一起的问题
+const width = svg.node().getBoundingClientRect().width;
+const height = svg.node().getBoundingClientRect().height;
+svg.attr("width", width).attr("height", height);
+
+const mainG = svg.append("g");
+svg.call(d3.zoom()
+.scaleExtent([0.1, 5])
+.on("zoom", (event) => { mainG.attr("transform", event.transform); })
+);
+
+// 提取TOP20竞争主体
+const topAssignees = Object.entries(globalData.assigneeRanking)
+.sort((a, b) => b[1] - a[1])
+.slice(0, 20);
+const nodes = topAssignees.map((a, i) => ({
+id: a[0], size: a[1], group: i % 5
+}));
+
+// 构建竞争连线
+const links = [];
+const nodeSet = new Set(nodes.map(n => n.id));
+Object.entries(globalData.assigneeCoMatrix).forEach(([key, val]) => {
+const parts = key.split("|");
+if (nodeSet.has(parts[0]) && nodeSet.has(parts[1])) {
+links.push({ source: parts[0], target: parts[1], value: val });
+}
+});
+
+// 初始化力导向图（使用实际宽高计算中心）
+this.simulation = d3.forceSimulation(nodes)
+.force("link", d3.forceLink(links).id(d => d.id).distance(150))
+.force("charge", d3.forceManyBody().strength(-300))
+.force("center", d3.forceCenter(width / 2, height / 2));
+
+// 绘制连线
+const link = mainG.append("g")
+.selectAll("line")
+.data(links)
+.enter().append("line")
+.attr("stroke", d => d.value > 10 ? "#f97316" : "#10b981")
+.attr("stroke-width", d => Math.sqrt(d.value));
+
+// 绘制节点
+const node = mainG.append("g")
+.selectAll("circle")
+.data(nodes)
+.enter().append("circle")
+.attr("r", d => Math.sqrt(d.size) + 5)
+.attr("fill", d => ["#10b981", "#38bdf8", "#818cf8", "#f59e0b", "#f43f5e"][d.group])
+.call(d3.drag()
+.on("start", dragstarted)
+.on("drag", dragged)
+.on("end", dragended)
+);
+
+// 绘制节点标签（截断过长名称）
+const label = mainG.append("g")
+.selectAll("text")
+.data(nodes)
+.enter().append("text")
+.text(d => d.id.length > 8 ? d.id.substring(0, 8) + "..." : d.id)
+.attr("font-size", 10)
+.attr("fill", "#e2e8f0")
+.attr("dx", 12)
+.attr("dy", 5);
+
+// 力导向图更新事件
+this.simulation.on("tick", () => {
+link
+.attr("x1", d => d.source.x)
+.attr("y1", d => d.source.y)
+.attr("x2", d => d.target.x)
+.attr("y2", d => d.target.y);
+
+node
+.attr("cx", d => d.x = Math.max(20, Math.min(width - 20, d.x)))
+.attr("cy", d => d.y = Math.max(20, Math.min(height - 20, d.y)));
+
+label
+.attr("x", d => d.x)
+.attr("y", d => d.y);
+});
+
+// 拖拽事件处理
+const self = this;
+function dragstarted(event, d) {
+if (!event.active) self.simulation.alphaTarget(0.3).restart();
+d.fx = d.x;
+d.fy = d.y;
+}
+
+function dragged(event, d) {
+d.fx = event.x;
+d.fy = event.y;
+}
+
+function dragended(event, d) {
+if (!event.active) self.simulation.alphaTarget(0);
+d.fx = null;
+d.fy = null;
+}
+
+// 节点交互
+node.on("mouseover", function (event, d) {
+const topTech = Object.keys(assigneeTechFocus[d.id] || {})
+.sort((a, b) => assigneeTechFocus[d.id][b] - assigneeTechFocus[d.id][a])[0] || "无";
+
+tooltip.style("opacity", 1)
+.html(`<strong>竞争主体</strong><br />${d.id}<br />专利数：${d.size} 件<br />核心技术：${topTech}`);
+d3.select(this).attr("stroke", "#fbbf24").attr("stroke-width", 2);
+})
+.on("mousemove", function (event) {
+tooltip.style("left", (event.pageX + 15) + "px")
+.style("top", (event.pageY - 20) + "px");
+})
+.on("mouseleave", function () {
+tooltip.style("opacity", 0);
+d3.select(this).attr("stroke", null).attr("stroke-width", 0);
+});
+}
+};
