@@ -1,0 +1,32 @@
+/* Act 3: 技术融合拓扑专属样式 */
+
+.split-network-container {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    height: 650px;
+    position: relative;
+    z-index: 1;
+}
+
+.network-svg-container {
+    background: #070c16;
+    border: 1px solid var(--border-glow);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+
+.insight-panel {
+    background: #0b1329;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto;
+    position: relative;
+    z-index: 1;
+}

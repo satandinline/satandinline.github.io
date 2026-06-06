@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>机器人专利创新全景智能化分析大屏</title>
+
+    <!-- 引入第三方库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+
+    <!-- 引入全局样式 -->
+    <link rel="stylesheet" href="css/global.css">
+
+    <!-- 引入各幕专属样式 (初始隐藏，通过JS控制显示) -->
+    <link rel="stylesheet" href="acts/act1/act1.css">
+    <link rel="stylesheet" href="acts/act2/act2.css">
+    <link rel="stylesheet" href="acts/act3/act3.css">
+    <link rel="stylesheet" href="acts/act4/act4.css">
+    <link rel="stylesheet" href="acts/act5/act5.css">
+</head>
+
+<body>
+    <div id="globalLoadingNotice">正在深度洗标、解算多维共现矩阵与风险特征，请稍候...</div>
+
+    <!-- 顶部导航栏 -->
+    <div class="top-navbar">
+        <div>
+            <h1>机器人专利创新全景智能化分析大屏</h1>
+            <span style="font-size: 12px; color: var(--text-secondary);">完全本地解算 · 离线全环境兼容版</span>
+        </div>
+        <div>
+            <input type="file" id="batchCsvFileUploader" accept=".csv" multiple style="display: none;">
+            <button class="file-selector-btn" onclick="document.getElementById('batchCsvFileUploader').click()">
+                📂 顺序注入本地专利CSV数据集 (可多选)
+            </button>
+        </div>
+    </div>
+
+    <!-- 标签切换栏 -->
+    <div class="narrative-tabs">
+        <button class="tab-btn active" onclick="switchNarrativeAct(1)">一、全景仪表盘</button>
+        <button class="tab-btn" onclick="switchNarrativeAct(2)">二、全球与区域空间格局</button>
+        <button class="tab-btn" onclick="switchNarrativeAct(3)">三、技术融合拓扑</button>
+        <button class="tab-btn" onclick="switchNarrativeAct(4)">四、主体竞争网络</button>
+        <button class="tab-btn" onclick="switchNarrativeAct(5)">五、价值预警矩阵</button>
+    </div>
+
+    <!-- 主内容区：动态加载各幕 HTML -->
+    <div id="mainDashboardView" class="main-content" style="display: none;">
+        <div id="narrativeAct1" class="narrative-section active" style="margin-bottom: 30px;">
+            <!-- Act 1 内容将通过 fetch 或静态包含加载，此处先保留占位，实际开发中建议用 JS 动态插入或后端模板 -->
+            <!-- 为了简化单文件运行，我们在这里直接包含结构，但逻辑已拆分 -->
+            <div class="hub-spoke-grid">
+                <div class="hub-central-core">
+                    <span style="color: var(--text-secondary); font-size: 14px;">清洗后有效专利</span>
+                    <div id="metricTotalCount" style="font-size: 48px; font-weight: 700; color: var(--cyan-accent);">0
+                    </div>
+                    <span id="metricSubDateRange"
+                        style="color: var(--text-secondary); font-size: 11px; padding: 0 10px;">统计周期</span>
+                </div>
+                <div class="dashboard-card" style="grid-column: 1; grid-row: 1;">
+                    <h3>专利法律审查结构</h3>
+                    <div class="canvas-wrapper"><canvas id="chartAct1GrantRate"></canvas></div>
+                </div>
+                <div class="dashboard-card" style="grid-column: 1; grid-row: 2;">
+                    <h3>高价值专利资产池</h3>
+                    <div style="display: flex; align-items: center; justify-content: space-around; height: 100%;">
+                        <div>
+                            <div id="metricHighValueCount"
+                                style="font-size: 36px; font-weight: 700; color: var(--amber-accent);">0</div>
+                            <div id="metricHighValueRatio" style="font-size:12px; color:var(--text-secondary);">占比 --%
+                            </div>
+                        </div>
+                        <div style="width: 120px; height: 120px;"><canvas id="chartAct1HighValueArc"></canvas></div>
+                    </div>
+                </div>
+                <div class="dashboard-card" style="grid-column: 3; grid-row: 1;">
+                    <h3>技术分支主题分布 (Top 6)</h3>
+                    <div class="canvas-wrapper"><canvas id="chartAct1TechRose"></canvas></div>
+                </div>
+                <div class="dashboard-card" style="grid-column: 3; grid-row: 2;">
+                    <h3>创新地市排行 TOP 5</h3>
+                    <div class="canvas-wrapper"><canvas id="chartAct1CityBar"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="narrativeAct2" class="narrative-section" style="margin-bottom: 30px;">
+            <div class="map-layout-container">
+                <div class="dashboard-card">
+                    <h3>全国省份专利密度图 (本显闭环版 - 鼠标悬停触发交互)</h3>
+                    <div class="canvas-wrapper" style="background: #090f1d; border-radius: 8px;">
+                        <svg id="offlineChinaMapSvg" width="100%" height="100%" viewBox="0 0 600 500"></svg>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <h3>全球专利布局分布 (受理局确权对比)</h3>
+                    <div class="canvas-wrapper" style="height: 50%;"><canvas id="chartAct2GlobalPie"></canvas></div>
+                    <div class="canvas-wrapper" style="height: 50%;"><canvas id="chartAct2GlobalBar"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="narrativeAct3" class="narrative-section" style="margin-bottom: 30px;">
+            <div class="split-network-container">
+                <div class="network-svg-container">
+                    <svg id="act3TechNetworkSvg" width="100%" height="100%"></svg>
+                </div>
+                <div class="insight-panel">
+                    <h3 style="margin:0; font-size:16px; color:var(--cyan-accent);">💡 技术共现拓扑面板</h3>
+                    <p style="font-size:12px; color:var(--text-secondary); margin:0; line-height:1.6;">
+                        <strong>业务图景现实逻辑：</strong>同一件专利如果包含多项交叉IPC分类号，即自动产生科学共现联结。线越粗意味着这些领域经常进行**联合研发跨界突破**。<br /><br />
+                        🔵 蓝色线：边缘交叉创新探索<br />
+                        🔴 红色粗线：核心高频绑定研发带
+                    </p>
+                    <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:5px 0;" />
+                    <div id="techInsightContent" style="font-size:13px; color:var(--text-primary);">
+                        <span style="color:var(--text-secondary);">点击网络中的任意技术球查看数据洞察...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="narrativeAct4" class="narrative-section" style="margin-bottom: 30px;">
+            <div class="split-network-container">
+                <div class="network-svg-container">
+                    <svg id="act4AssigneeNetworkSvg" width="100%" height="100%"></svg>
+                </div>
+                <div class="insight-panel">
+                    <h3 style="margin:0; font-size:16px; color:var(--emerald-accent);">⚔️ 竞争主体格局面板</h3>
+                    <p style="font-size:12px; color:var(--text-secondary); margin:0; line-height:1.6;">
+                        <strong>业务图景现实逻辑：</strong>如果两个企业或高校在同一细分机器人核心技术分支中密集申请专利，意味着强烈的**正面市场对决与研发对抗**。节点越大实力越雄厚。<br /><br />
+                        🟢 绿色细线：技术板块存在重叠<br />
+                        🔥 橙色粗线：白热化主战场对攻！
+                    </p>
+                    <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:5px 0;" />
+                    <div id="assigneeInsightContent" style="font-size:13px; color:var(--text-primary);">
+                        <span style="color:var(--text-secondary);">点击网络中的主体节点查看竞争宿敌分析...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="narrativeAct5" class="narrative-section" style="margin-bottom: 30px;">
+            <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 25px;">
+                <div class="dashboard-card" style="height: 450px;">
+                    <h3>高价值专利多指标核心挖掘矩阵</h3>
+                    <div class="canvas-wrapper"><canvas id="chartAct5ValueFeature"></canvas></div>
+                </div>
+                <div class="dashboard-card" style="height: 450px;">
+                    <h3>资产运营风险监控与生命周期预警</h3>
+                    <div class="canvas-wrapper"><canvas id="chartAct5RiskMonitor"></canvas></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="globalTooltip" class="tooltip"></div>
+
+    <!-- 引入核心逻辑与各幕逻辑 -->
+    <!-- 1. 数据管道（包含 executeCoreDataPipeline、triggerSectionLazyRender 和 renderAllSectionsOnce） -->
+    <script src="js/data-pipeline.js"></script>
+    <!-- 2. 核心控制（包含文件上传和标签切换） -->
+    <script src="js/core.js"></script>
+    <!-- 3. 各幕渲染逻辑（每个文件包含对应的 renderActX 函数） -->
+    <script src="acts/act1/act1.js"></script>
+    <script src="acts/act2/act2.js"></script>
+    <script src="acts/act3/act3.js"></script>
+    <script src="acts/act4/act4.js"></script>
+    <script src="acts/act5/act5.js"></script>
+</body>
+
+</html>
