@@ -136,6 +136,8 @@ function executeCoreDataPipeline() {
         document.getElementById('mainDashboardView').style.display = 'block';
         document.getElementById('globalLoadingNotice').style.display = 'none';
 
+        console.log(`数据管道执行完成：共处理 ${globalProcessedMetrics.totalCount} 条专利记录`);
+
         // 全量预渲染：依次调用所有 5 个幕的渲染函数
         // 注意：由于某些幕处于 display:none 状态，我们需要临时显示它们以便 Chart.js/D3 能正确计算尺寸
         renderAllSectionsOnce();

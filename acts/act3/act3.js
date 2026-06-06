@@ -30,14 +30,14 @@ function renderAct3() {
         .force("collide", d3.forceCollide().radius(35));
 
     const link = mainG.append("g").selectAll("line").data(links).join("line")
-        .attr("stroke", d => d.value > 2 ? "rgba(244,63,94,0.8)" : "rgba(56,189,248,0.3)")
+        .attr("stroke", d => d.value > 2 ? "rgba(225,29,72,0.8)" : "rgba(2,132,199,0.3)")
         .attr("stroke-width", d => Math.max(1.5, Math.sqrt(d.value)));
 
     const node = mainG.append("g").selectAll("g").data(nodes).join("g").attr("cursor", "pointer")
         .on("click", function (event, d) {
             let linkedTotal = links.filter(l => l.source.id === d.id || l.target.id === d.id).length;
             document.getElementById("techInsightContent").innerHTML = `
-                <div style='background:#1e293b; padding:12px; border-radius:6px; border-left:4px solid var(--cyan-accent)'>
+                <div style='background:#f8fafc; padding:12px; border-radius:6px; border-left:4px solid var(--cyan-accent)'>
                     <strong>🔍 选中分类标签：</strong><br/>${d.id}<br/><br/>
                     <strong>📊 统计热度：</strong>本批数据包含 <span style='color:var(--amber-accent); font-weight:bold;'>${d.size}</span> 件资产。<br/><br/>
                     <strong>🔗 技术衍生交集：</strong>与拓扑图中其他 <span style='color:var(--cyan-accent)'>${linkedTotal}</span> 个细分技术组存在深度跨界协同。
@@ -45,7 +45,7 @@ function renderAct3() {
             `;
         });
 
-    node.append("circle").attr("r", d => Math.min(22, 9 + Math.sqrt(d.size))).attr("fill", d => ["#38bdf8", "#10b981", "#818cf8", "#f59e0b"][d.group]).attr("stroke", "#fff").attr("stroke-width", 1);
+    node.append("circle").attr("r", d => Math.min(22, 9 + Math.sqrt(d.size))).attr("fill", d => ["#0284c7", "#059669", "#6366f1", "#d97706"][d.group]).attr("stroke", "#fff").attr("stroke-width", 1);
     node.append("text").attr("dy", 3).attr("text-anchor", "middle").text(d => d.id.substring(0, 4)).attr("fill", "#fff").style("font-size", "9px").style("font-weight", "bold");
 
     simulation.on("tick", () => {

@@ -8,7 +8,7 @@ function renderAct5() {
             labels: ['核心高价值资产群 (Score>=45)', '中等力量资产群 (Score 20~44)', '长尾初筛资产群 (Score<20)'],
             datasets: [{
                 data: [globalProcessedMetrics.valueScoreDistribution.high, globalProcessedMetrics.valueScoreDistribution.mid, globalProcessedMetrics.valueScoreDistribution.low],
-                backgroundColor: ['#f59e0b', '#38bdf8', '#475569'],
+                backgroundColor: ['#d97706', '#0284c7', '#64748b'],
                 borderRadius: 6
             }]
         },
@@ -16,8 +16,8 @@ function renderAct5() {
             responsive: true, maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-                x: { ticks: { color: '#94a3b8' }, grid: { display: false } },
-                y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }
+                x: { ticks: { color: '#64748b' }, grid: { display: false } },
+                y: { ticks: { color: '#64748b' }, grid: { color: 'rgba(0,0,0,0.05)' } }
             }
         }
     });
@@ -29,13 +29,13 @@ function renderAct5() {
             labels: ['已到期/终止失效风险', '临近3年内到期预警', '稳健期安全运营资产'],
             datasets: [{
                 data: [globalProcessedMetrics.riskDistribution.expired, globalProcessedMetrics.riskDistribution.critical, globalProcessedMetrics.riskDistribution.normal],
-                backgroundColor: ['#f43f5e', '#fb923c', '#10b981'],
+                backgroundColor: ['#e11d48', '#fb923c', '#059669'],
                 borderWidth: 0
             }]
         },
         options: {
             responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 12 } } } }
+            plugins: { legend: { position: 'right', labels: { color: '#64748b', font: { size: 12 } } } }
         }
     });
 }

@@ -28,11 +28,11 @@ function renderAct2() {
 
     let counts = Object.values(globalProcessedMetrics.provinceRanking);
     let maxVal = Math.max(...counts, 5);
-    let colorScale = d3.scaleLinear().domain([0, Math.log10(maxVal)]).range(["#131e35", "#38bdf8"]);
+    let colorScale = d3.scaleLinear().domain([0, Math.log10(maxVal)]).range(["#e0f2fe", "#0284c7"]);
 
     Object.entries(OFFLINE_GEO_DATA).forEach(([provName, pathStr]) => {
         let count = globalProcessedMetrics.provinceRanking[provName] || 0;
-        let fillColor = count === 0 ? "#0d1527" : colorScale(Math.log10(count));
+        let fillColor = count === 0 ? "#f1f5f9" : colorScale(Math.log10(count));
 
         svg.append("path")
             .attr("d", pathStr)
@@ -61,17 +61,17 @@ function renderAct2() {
             labels: gbData.map(x => dictName[x[0]] || x[0]),
             datasets: [{
                 data: gbData.map(x => x[1]),
-                backgroundColor: ['#38bdf8', '#818cf8', '#f59e0b', '#10b981', '#f43f5e'],
+                backgroundColor: ['#0284c7', '#6366f1', '#d97706', '#059669', '#e11d48'],
                 borderWidth: 1,
-                borderColor: '#0f172a'
+                borderColor: '#ffffff'
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'right', labels: { color: '#94a3b8' } },
-                title: { display: true, text: '受理局确权对比分布', color: '#fff' }
+                legend: { position: 'right', labels: { color: '#64748b' } },
+                title: { display: true, text: '受理局确权对比分布', color: '#0f172a' }
             }
         }
     });
@@ -83,7 +83,7 @@ function renderAct2() {
             labels: gbData.map(x => dictName[x[0]] || x[0]),
             datasets: [{
                 data: gbData.map(x => x[1]),
-                backgroundColor: '#10b981',
+                backgroundColor: '#059669',
                 borderRadius: 4
             }]
         },
@@ -91,8 +91,8 @@ function renderAct2() {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: { ticks: { color: '#94a3b8' } },
-                y: { ticks: { color: '#94a3b8' } }
+                x: { ticks: { color: '#64748b' } },
+                y: { ticks: { color: '#64748b' } }
             },
             plugins: { legend: { display: false } }
         }

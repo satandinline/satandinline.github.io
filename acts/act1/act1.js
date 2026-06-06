@@ -17,14 +17,14 @@ function renderAct1() {
             labels: Object.keys(globalProcessedMetrics.legalStatusStats),
             datasets: [{
                 data: Object.values(globalProcessedMetrics.legalStatusStats),
-                backgroundColor: ['#10b981', '#38bdf8', '#fb7185', '#475569'],
+                backgroundColor: ['#10b981', '#0284c7', '#fb7185', '#64748b'],
                 borderWidth: 0
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { position: 'right', labels: { color: '#94a3b8' } } }
+            plugins: { legend: { position: 'right', labels: { color: '#64748b' } } }
         }
     });
 
@@ -34,7 +34,7 @@ function renderAct1() {
         data: {
             datasets: [{
                 data: [globalProcessedMetrics.highValueCount, Math.max(1, globalProcessedMetrics.totalCount - globalProcessedMetrics.highValueCount)],
-                backgroundColor: ['#f59e0b', '#1e293b'],
+                backgroundColor: ['#d97706', '#e2e8f0'],
                 borderWidth: 0
             }]
         },
@@ -54,15 +54,15 @@ function renderAct1() {
             labels: sortedTech.map(x => x[0].substring(0, 8)),
             datasets: [{
                 data: sortedTech.map(x => x[1]),
-                backgroundColor: ['rgba(56,189,248,0.6)', 'rgba(129,140,248,0.6)', 'rgba(16,185,129,0.6)', 'rgba(244,63,94,0.6)', 'rgba(245,158,11,0.6)', 'rgba(45,212,191,0.6)'],
-                borderColor: '#0f172a'
+                backgroundColor: ['rgba(2,132,199,0.6)', 'rgba(99,102,241,0.6)', 'rgba(5,150,105,0.6)', 'rgba(225,29,72,0.6)', 'rgba(217,119,6,0.6)', 'rgba(14,165,233,0.6)'],
+                borderColor: '#ffffff'
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: { r: { ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.05)' } } },
-            plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 10 } } } }
+            scales: { r: { ticks: { display: false }, grid: { color: 'rgba(0,0,0,0.05)' } } },
+            plugins: { legend: { position: 'right', labels: { color: '#64748b', font: { size: 10 } } } }
         }
     });
 
@@ -74,7 +74,7 @@ function renderAct1() {
             labels: sortedCity.map(x => x[0]),
             datasets: [{
                 data: sortedCity.map(x => x[1]),
-                backgroundColor: '#38bdf8',
+                backgroundColor: '#0284c7',
                 borderRadius: 4
             }]
         },
@@ -83,8 +83,8 @@ function renderAct1() {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                y: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+                x: { ticks: { color: '#64748b' }, grid: { color: 'rgba(0,0,0,0.05)' } },
+                y: { ticks: { color: '#64748b' }, grid: { display: false } }
             },
             plugins: { legend: { display: false } }
         }

@@ -10,7 +10,7 @@
 }
 
 .network-svg-container {
-    background: #070c16;
+    background: #f8fafc;
     border: 1px solid var(--border-glow);
     border-radius: 12px;
     overflow: hidden;
@@ -19,8 +19,8 @@
 }
 
 .insight-panel {
-    background: #0b1329;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 12px;
     padding: 20px;
     display: flex;

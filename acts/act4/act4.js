@@ -30,13 +30,13 @@ function renderAct4() {
         .force("collide", d3.forceCollide().radius(45));
 
     const link = mainG.append("g").selectAll("line").data(links).join("line")
-        .attr("stroke", "rgba(245,158,11,0.7)").attr("stroke-width", 2);
+        .attr("stroke", "rgba(217,119,6,0.7)").attr("stroke-width", 2);
 
     const node = mainG.append("g").selectAll("g").data(nodes).join("g").attr("cursor", "pointer")
         .on("click", function (event, d) {
             let primaryTech = Object.keys(assigneeTechFocus[d.id] || {})[0] || '未明确主技术域';
             document.getElementById("assigneeInsightContent").innerHTML = `
-                <div style='background:#0d1e3d; padding:12px; border-radius:6px; border-left:4px solid var(--emerald-accent)'>
+                <div style='background:#f8fafc; padding:12px; border-radius:6px; border-left:4px solid var(--emerald-accent)'>
                     <strong>🏢 锁定实体名称：</strong><br/>${d.id}<br/><br/>
                     <strong>📈 机器人技术持有量：</strong>当前拥有 <span style='color:var(--cyan-accent); font-weight:bold;'>${d.size}</span> 件在册专利。<br/><br/>
                     <strong>🎯 研发布局主攻板块：</strong><br/><span style='color:var(--amber-accent);'>${primaryTech}</span><br/><br/>
@@ -45,7 +45,7 @@ function renderAct4() {
             `;
         });
 
-    node.append("circle").attr("r", d => Math.min(26, 11 + Math.sqrt(d.size))).attr("fill", "#818cf8").attr("stroke", "#fff").attr("stroke-width", 1.5);
+    node.append("circle").attr("r", d => Math.min(26, 11 + Math.sqrt(d.size))).attr("fill", "#6366f1").attr("stroke", "#fff").attr("stroke-width", 1.5);
     node.append("text").attr("dy", -3).attr("text-anchor", "middle").text(d => d.id.substring(0, 5)).attr("fill", "#fff").style("font-size", "10px");
 
     simulation.on("tick", () => {
