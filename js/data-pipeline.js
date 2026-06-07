@@ -97,7 +97,7 @@ function executeCoreDataPipeline() {
             valueScore += Math.min(citeCount * 8, 40);
             valueScore += Math.min(familyCount * 4, 18);
 
-            if (valueScore >= 45) {
+            if (cleanStatus === '授权' && valueScore >= 45) {
                 globalProcessedMetrics.highValueCount++;
                 globalProcessedMetrics.valueScoreDistribution.high++;
             } else if (valueScore >= 20) {
