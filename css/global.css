@@ -98,6 +98,44 @@ body {
     /* 激活的幕层级更高 */
 }
 
+/* 全局卡片基础样式 */
+.dashboard-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-glow);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.dashboard-card:hover {
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.12);
+    border-color: var(--cyan-accent);
+    cursor: pointer;
+}
+
+.dashboard-card h3 {
+    margin: 0 0 4px 0;
+    font-size: 13px;
+    color: var(--text-primary);
+    border-left: 3px solid var(--cyan-accent);
+    padding-left: 6px;
+    line-height: 1.4;
+}
+
+.canvas-wrapper {
+    flex-grow: 1;
+    position: relative;
+    height: 100%;
+    width: 100%;
+    min-height: 100px;
+}
+
 .tooltip {
     position: absolute;
     padding: 8px;

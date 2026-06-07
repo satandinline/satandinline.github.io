@@ -8,6 +8,8 @@
 
     <!-- 引入第三方库 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap"
@@ -57,11 +59,11 @@
             <!-- 为了简化单文件运行，我们在这里直接包含结构，但逻辑已拆分 -->
             <div class="hub-spoke-grid">
                 <div class="hub-central-core">
-                    <span style="color: var(--text-secondary); font-size: 14px;">清洗后有效专利</span>
-                    <div id="metricTotalCount" style="font-size: 48px; font-weight: 700; color: var(--cyan-accent);">0
+                    <span style="color: var(--text-secondary); font-size: 12px;">清洗后有效专利</span>
+                    <div id="metricTotalCount" style="font-size: 36px; font-weight: 700; color: var(--cyan-accent);">0
                     </div>
                     <span id="metricSubDateRange"
-                        style="color: var(--text-secondary); font-size: 11px; padding: 0 10px;">统计周期</span>
+                        style="color: var(--text-secondary); font-size: 10px; padding: 0 8px;">统计周期</span>
                 </div>
                 <div class="dashboard-card" style="grid-column: 1; grid-row: 1;">
                     <h3>专利法律审查结构</h3>
@@ -84,7 +86,7 @@
                     <div class="canvas-wrapper"><canvas id="chartAct1TechRose"></canvas></div>
                 </div>
                 <div class="dashboard-card" style="grid-column: 3; grid-row: 2;">
-                    <h3>创新地市排行 TOP 5</h3>
+                    <h3 style="color: var(--cyan-accent);">创新地市排行 TOP 5</h3>
                     <div class="canvas-wrapper"><canvas id="chartAct1CityBar"></canvas></div>
                 </div>
             </div>
