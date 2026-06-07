@@ -9,26 +9,65 @@ function renderAct1() {
     let pct = globalProcessedMetrics.totalCount > 0 ? ((globalProcessedMetrics.highValueCount / globalProcessedMetrics.totalCount) * 100).toFixed(1) : 0;
     document.getElementById('metricHighValueRatio').innerText = `高价值资产占比 ${pct}%`;
 
-    // ========== 1. 专利法律审查结构环形图（带百分比） ==========
+    // ========== 1. 专利法律审查结构环形图（带百分比 + 点击筛选） ==========
     clearCanvas('chartAct1GrantRate');
     const legalLabels = Object.keys(globalProcessedMetrics.legalStatusStats);
     const legalValues = Object.values(globalProcessedMetrics.legalStatusStats);
     const legalTotal = legalValues.reduce((s, v) => s + v, 0);
     // 为小扇区设置最小显示值，确保弧线在图上可见（最少占3%视觉弧度）
     const minVisualPct = 0.03;
-    const legalDisplayValues = legalValues.map(v => {
-        if (v === 0) return 0;
-        return Math.max(v, legalTotal * minVisualPct);
-    });
-    // 记录当前高亮（划线）的索引
+    // 记录被筛选掉（划线/隐藏）的索引集合
+    const hiddenSet = new Set();
+    // 记录当前高亮（hover）的索引
     let hoveredIdx = -1;
+
+    function getVisibleTotal() {
+        return legalValues.reduce((s, v, i) => hiddenSet.has(i) ? s : s + v, 0);
+    }
+    function getDisplayValues() {
+        const visTotal = getVisibleTotal();
+        return legalValues.map((v, i) => {
+            if (hiddenSet.has(i)) return 0;
+            if (v === 0) return 0;
+            return Math.max(v, visTotal * minVisualPct);
+        });
+    }
+
+    // 自定义插件：为被筛选掉的图例项绘制删除线
+    const legendStrikethroughPlugin = {
+        id: 'legendStrikethrough',
+        afterDraw(chart) {
+            const legend = chart.legend;
+            if (!legend || !legend.legendItems) return;
+            const ctx = chart.ctx;
+            legend.legendItems.forEach((item) => {
+                if (item.textDecoration === 'line-through') {
+                    const textWidth = ctx.measureText(item.text).width;
+                    const x = item.textAlign === 'center'
+                        ? item.x - textWidth / 2
+                        : (item.textAlign === 'right' ? item.x - textWidth : item.x);
+                    const y = item.y + (item.font ? item.font.size / 3 : 4);
+                    ctx.save();
+                    ctx.strokeStyle = '#cbd5e1';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y);
+                    ctx.lineTo(x + textWidth, y);
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            });
+        }
+    };
+
     loadedChartsInstances['chartAct1GrantRate'] = new Chart(document.getElementById('chartAct1GrantRate').getContext('2d'), {
         type: 'doughnut',
+        plugins: [legendStrikethroughPlugin],
         data: {
             labels: legalLabels,
             datasets: [{
-                data: legalDisplayValues,
-                backgroundColor: ['#22c55e', '#3b82f6', '#f43f5e', '#f59e0b'],
+                data: getDisplayValues(),
+                backgroundColor: legalLabels.map((_, i) => hiddenSet.has(i) ? '#e2e8f0' : ['#22c55e', '#3b82f6', '#f43f5e', '#f59e0b'][i]),
                 borderWidth: 2,
                 borderColor: '#ffffff',
                 hoverOffset: 8
@@ -45,10 +84,31 @@ function renderAct1() {
                     return;
                 }
                 const idx = elements[0].index;
+                if (hiddenSet.has(idx)) {
+                    hoveredIdx = -1;
+                    chart.update('none');
+                    return;
+                }
                 if (hoveredIdx !== idx) {
                     hoveredIdx = idx;
                     chart.update('none');
                 }
+            },
+            onClick: function (evt, elements, chart) {
+                if (!elements.length) return;
+                const idx = elements[0].index;
+                if (hiddenSet.has(idx)) {
+                    hiddenSet.delete(idx);
+                } else {
+                    // 至少保留一项可见
+                    if (hiddenSet.size >= legalLabels.length - 1) return;
+                    hiddenSet.add(idx);
+                }
+                hoveredIdx = -1;
+                // 更新数据
+                chart.data.datasets[0].data = getDisplayValues();
+                chart.data.datasets[0].backgroundColor = legalLabels.map((_, i) => hiddenSet.has(i) ? '#e2e8f0' : ['#22c55e', '#3b82f6', '#f43f5e', '#f59e0b'][i]);
+                chart.update();
             },
             plugins: {
                 legend: {
@@ -63,21 +123,43 @@ function renderAct1() {
                         boxHeight: 16,
                         generateLabels: function (chart) {
                             const dataset = chart.data.datasets[0];
+                            const visTotal = getVisibleTotal();
                             return chart.data.labels.map((label, i) => {
                                 const val = legalValues[i];
-                                const pct = legalTotal > 0 ? ((val / legalTotal) * 100).toFixed(1) : 0;
+                                const isHidden = hiddenSet.has(i);
                                 const isHovered = (i === hoveredIdx);
+                                // 被筛选掉的项不显示百分比
+                                const pct = (!isHidden && visTotal > 0) ? ((val / visTotal) * 100).toFixed(1) : null;
+                                const pctStr = pct !== null ? `  ${pct}%` : '';
+                                // 被筛选掉的项文字变灰并加删除线效果（通过变灰+变浅色模拟）
+                                const fontColor = isHidden ? '#cbd5e1' : (isHovered ? dataset.backgroundColor[i] : '#334155');
                                 return {
-                                    text: `${label}  ${pct}%`,
-                                    fillStyle: dataset.backgroundColor[i],
-                                    strokeStyle: isHovered ? '#ffffff' : dataset.backgroundColor[i],
+                                    text: `${label}${pctStr}`,
+                                    fillStyle: isHidden ? '#e2e8f0' : dataset.backgroundColor[i],
+                                    strokeStyle: isHovered ? '#ffffff' : (isHidden ? '#e2e8f0' : dataset.backgroundColor[i]),
                                     lineWidth: isHovered ? 2 : 0,
-                                    fontColor: isHovered ? dataset.backgroundColor[i] : '#334155',
-                                    pointStyle: 'rectRounded',
-                                    index: i
+                                    fontColor: fontColor,
+                                    textDecoration: isHidden ? 'line-through' : '',
+                                    pointStyle: isHidden ? 'line' : 'rectRounded',
+                                    index: i,
+                                    hidden: false
                                 };
                             });
                         }
+                    },
+                    onClick: function (evt, legendItem, legend) {
+                        const idx = legendItem.index;
+                        const chart = legend.chart;
+                        if (hiddenSet.has(idx)) {
+                            hiddenSet.delete(idx);
+                        } else {
+                            if (hiddenSet.size >= legalLabels.length - 1) return;
+                            hiddenSet.add(idx);
+                        }
+                        hoveredIdx = -1;
+                        chart.data.datasets[0].data = getDisplayValues();
+                        chart.data.datasets[0].backgroundColor = legalLabels.map((_, i) => hiddenSet.has(i) ? '#e2e8f0' : ['#22c55e', '#3b82f6', '#f43f5e', '#f59e0b'][i]);
+                        chart.update();
                     }
                 },
                 tooltip: {
@@ -92,57 +174,73 @@ function renderAct1() {
                     titleFont: { size: 13, weight: '700' },
                     displayColors: true,
                     boxPadding: 4,
+                    filter: function (tooltipItem) {
+                        return !hiddenSet.has(tooltipItem.dataIndex);
+                    },
                     callbacks: {
                         label: function (ctx) {
                             const val = legalValues[ctx.dataIndex];
-                            const pct = legalTotal > 0 ? ((val / legalTotal) * 100).toFixed(1) : 0;
+                            const visTotal = getVisibleTotal();
+                            const pct = visTotal > 0 ? ((val / visTotal) * 100).toFixed(1) : 0;
                             return ` ${ctx.label}：${Number(val).toLocaleString()} 件（${pct}%）`;
                         }
                     }
                 },
                 datalabels: {
+                    display: function (ctx) {
+                        return !hiddenSet.has(ctx.dataIndex);
+                    },
                     font: { weight: 'bold', size: 11 },
                     color: function (ctx) {
+                        if (hiddenSet.has(ctx.dataIndex)) return 'transparent';
                         const val = legalValues[ctx.dataIndex];
-                        const pct = legalTotal > 0 ? (val / legalTotal) * 100 : 0;
+                        const visTotal = getVisibleTotal();
+                        const pct = visTotal > 0 ? (val / visTotal) * 100 : 0;
                         if (pct < 5) return '#334155';
-                        // 浅色扇区（黄/琥珀）用深色文字保证对比度
                         const bgColor = ctx.dataset.backgroundColor[ctx.dataIndex];
                         return (bgColor === '#f59e0b' || bgColor === '#fbbf24') ? '#1e293b' : '#ffffff';
                     },
                     align: function (ctx) {
                         const val = legalValues[ctx.dataIndex];
-                        const pct = legalTotal > 0 ? (val / legalTotal) * 100 : 0;
+                        const visTotal = getVisibleTotal();
+                        const pct = visTotal > 0 ? (val / visTotal) * 100 : 0;
                         return pct < 5 ? 'end' : 'center';
                     },
                     anchor: function (ctx) {
                         const val = legalValues[ctx.dataIndex];
-                        const pct = legalTotal > 0 ? (val / legalTotal) * 100 : 0;
+                        const visTotal = getVisibleTotal();
+                        const pct = visTotal > 0 ? (val / visTotal) * 100 : 0;
                         return pct < 5 ? 'end' : 'center';
                     },
                     offset: function (ctx) {
                         const val = legalValues[ctx.dataIndex];
-                        const pct = legalTotal > 0 ? (val / legalTotal) * 100 : 0;
+                        const visTotal = getVisibleTotal();
+                        const pct = visTotal > 0 ? (val / visTotal) * 100 : 0;
                         return pct < 5 ? 8 : 0;
                     },
                     clamp: true,
                     formatter: function (value, ctx) {
+                        if (hiddenSet.has(ctx.dataIndex)) return '';
                         const label = ctx.chart.data.labels[ctx.dataIndex];
                         const realVal = legalValues[ctx.dataIndex];
-                        const pct = legalTotal > 0 ? ((realVal / legalTotal) * 100).toFixed(1) : 0;
+                        const visTotal = getVisibleTotal();
+                        const pct = visTotal > 0 ? ((realVal / visTotal) * 100).toFixed(1) : 0;
                         return [label, `${pct}%`];
                     },
                     textStrokeColor: function (ctx) {
+                        if (hiddenSet.has(ctx.dataIndex)) return 'transparent';
                         const val = legalValues[ctx.dataIndex];
-                        const pct = legalTotal > 0 ? (val / legalTotal) * 100 : 0;
+                        const visTotal = getVisibleTotal();
+                        const pct = visTotal > 0 ? (val / visTotal) * 100 : 0;
                         if (pct < 5) return 'transparent';
                         const bgColor = ctx.dataset.backgroundColor[ctx.dataIndex];
-                        // 浅色扇区用白色描边增强对比，深色扇区用暗色描边
                         return (bgColor === '#f59e0b' || bgColor === '#fbbf24') ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.35)';
                     },
                     textStrokeWidth: function (ctx) {
+                        if (hiddenSet.has(ctx.dataIndex)) return 0;
                         const val = legalValues[ctx.dataIndex];
-                        const pct = legalTotal > 0 ? (val / legalTotal) * 100 : 0;
+                        const visTotal = getVisibleTotal();
+                        const pct = visTotal > 0 ? (val / visTotal) * 100 : 0;
                         return pct < 5 ? 0 : 2;
                     }
                 }
