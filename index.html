@@ -11,6 +11,8 @@
     <script
         src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    <script src="https://cdn.kesci.com/lib/pyecharts_assets/maps/china.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap"
         rel="stylesheet">
@@ -33,20 +35,13 @@
     <div class="top-navbar">
         <div>
             <h1>机器人专利创新全景智能化分析大屏</h1>
-
-        </div>
-        <div>
-            <input type="file" id="batchCsvFileUploader" accept=".csv" multiple style="display: none;">
-            <button class="file-selector-btn" onclick="document.getElementById('batchCsvFileUploader').click()">
-                📂 顺序注入本地专利CSV数据集 (可多选)
-            </button>
         </div>
     </div>
 
     <!-- 标签切换栏 -->
     <div class="narrative-tabs">
         <button class="tab-btn active" onclick="switchNarrativeAct(1)">一、全景仪表盘</button>
-        <button class="tab-btn" onclick="switchNarrativeAct(2)">二、全球与区域空间格局</button>
+        <button class="tab-btn" onclick="switchNarrativeAct(2)">二、区域空间格局</button>
         <button class="tab-btn" onclick="switchNarrativeAct(3)">三、技术融合拓扑</button>
         <button class="tab-btn" onclick="switchNarrativeAct(4)">四、主体竞争网络</button>
         <button class="tab-btn" onclick="switchNarrativeAct(5)">五、价值预警矩阵</button>
@@ -54,7 +49,7 @@
 
     <!-- 主内容区：动态加载各幕 HTML -->
     <div id="mainDashboardView" class="main-content" style="display: none;">
-        <div id="narrativeAct1" class="narrative-section active" style="margin-bottom: 30px;">
+        <div id="narrativeAct1" class="narrative-section active">
             <!-- Act 1 内容将通过 fetch 或静态包含加载，此处先保留占位，实际开发中建议用 JS 动态插入或后端模板 -->
             <!-- 为了简化单文件运行，我们在这里直接包含结构，但逻辑已拆分 -->
             <div class="hub-spoke-grid">
@@ -92,23 +87,14 @@
             </div>
         </div>
 
-        <div id="narrativeAct2" class="narrative-section" style="margin-bottom: 30px;">
-            <div class="map-layout-container">
-                <div class="dashboard-card">
-                    <h3>全国省份专利密度图 (本显闭环版 - 鼠标悬停触发交互)</h3>
-                    <div class="canvas-wrapper" style="background: #090f1d; border-radius: 8px;">
-                        <svg id="offlineChinaMapSvg" width="100%" height="100%" viewBox="0 0 600 500"></svg>
-                    </div>
-                </div>
-                <div class="dashboard-card">
-                    <h3>全球专利布局分布 (受理局确权对比)</h3>
-                    <div class="canvas-wrapper" style="height: 50%;"><canvas id="chartAct2GlobalPie"></canvas></div>
-                    <div class="canvas-wrapper" style="height: 50%;"><canvas id="chartAct2GlobalBar"></canvas></div>
-                </div>
+        <div id="narrativeAct2" class="narrative-section">
+            <div class="dashboard-card">
+                <h3>全国省份专利密度热力图 (鼠标悬停查看省份详情)</h3>
+                <div id="echartsChinaMap" style="width: 100%; height: 550px;"></div>
             </div>
         </div>
 
-        <div id="narrativeAct3" class="narrative-section" style="margin-bottom: 30px;">
+        <div id="narrativeAct3" class="narrative-section">
             <div class="split-network-container">
                 <div class="network-svg-container">
                     <svg id="act3TechNetworkSvg" width="100%" height="100%"></svg>
@@ -128,7 +114,7 @@
             </div>
         </div>
 
-        <div id="narrativeAct4" class="narrative-section" style="margin-bottom: 30px;">
+        <div id="narrativeAct4" class="narrative-section">
             <div class="split-network-container">
                 <div class="network-svg-container">
                     <svg id="act4AssigneeNetworkSvg" width="100%" height="100%"></svg>
@@ -148,7 +134,7 @@
             </div>
         </div>
 
-        <div id="narrativeAct5" class="narrative-section" style="margin-bottom: 30px;">
+        <div id="narrativeAct5" class="narrative-section">
             <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 25px;">
                 <div class="dashboard-card" style="height: 450px;">
                     <h3>高价值专利多指标核心挖掘矩阵</h3>
