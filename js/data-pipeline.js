@@ -41,10 +41,26 @@ function executeCoreDataPipeline() {
             globalProcessedMetrics.globalRanking[auth] = (globalProcessedMetrics.globalRanking[auth] || 0) + 1;
 
             // 4. 地理区域映射
+            // 中国港澳台地区缩写映射（CSV中台湾和香港使用英文缩写代码）
+            const CN_REGION_ABBR = { 'TW': '台湾', 'HK': '香港' };
+            // 已知的境外省份/州代码（美国州代码、外国国家代码等），不计入中国省份排名
+            const FOREIGN_CODES = new Set([
+                'CA', 'MA', 'TX', 'MI', 'VA', 'GA', 'NY', 'IL', 'WA', 'NJ', 'NV',
+                'OR', 'FL', 'CT', 'PA', 'KY', 'DE', 'BY', 'HE', 'JE',
+                'Kanagawa-ken', 'Iwate Prefecture', 'Daegu', 'Gyeongsangbuk-do', 'Seoul',
+                'Occitanie'
+            ]);
             let rawProv = row['当前申请(专利权)人州/省'] || '';
-            if (rawProv && rawProv !== '-') {
-                let cleanProv = rawProv.replace(/省|市|自治区|回族|壮族|维吾尔|特别行政区/g, '').trim();
-                if (cleanProv) globalProcessedMetrics.provinceRanking[cleanProv] = (globalProcessedMetrics.provinceRanking[cleanProv] || 0) + 1;
+            if (rawProv && rawProv !== '-' && rawProv !== '未知' && rawProv !== '境外') {
+                let rawTrim = rawProv.trim();
+                // 优先尝试港澳台缩写映射
+                if (CN_REGION_ABBR[rawTrim]) {
+                    globalProcessedMetrics.provinceRanking[CN_REGION_ABBR[rawTrim]] = (globalProcessedMetrics.provinceRanking[CN_REGION_ABBR[rawTrim]] || 0) + 1;
+                } else if (!FOREIGN_CODES.has(rawTrim)) {
+                    // 排除境外代码，只统计中国省份
+                    let cleanProv = rawProv.replace(/省|市|自治区|回族|壮族|维吾尔|特别行政区|蒙古族/g, '').trim();
+                    if (cleanProv) globalProcessedMetrics.provinceRanking[cleanProv] = (globalProcessedMetrics.provinceRanking[cleanProv] || 0) + 1;
+                }
             }
             let rawCity = row['当前申请(专利权)人地市'] || '';
             if (rawCity && rawCity !== '-') {

@@ -23,56 +23,45 @@ function switchNarrativeAct(actId) {
                         block: 'start'
                     });
                 }
-            }, 100); // 延迟确保 DOM 更新完成
+            }, 100);
         }
     });
 }
 
-// 文件上传处理
+// 页面加载时自动读取 patent.csv 并执行数据管道
 document.addEventListener('DOMContentLoaded', () => {
-    const uploader = document.getElementById('batchCsvFileUploader');
-    if (uploader) {
-        uploader.addEventListener('change', function (e) {
-            const uploadedFiles = e.target.files;
-            if (uploadedFiles.length === 0) return;
+    document.getElementById('globalLoadingNotice').style.display = 'block';
 
-            document.getElementById('globalLoadingNotice').style.display = 'block';
-            rawGlobalPatentDataset = [];
-            let completeCount = 0;
-
-            for (let i = 0; i < uploadedFiles.length; i++) {
-                Papa.parse(uploadedFiles[i], {
-                    header: true, skipEmptyLines: true, encoding: "GBK",
-                    complete: function (parsedResults) {
-                        let keys = Object.keys(parsedResults.data[0] || {});
-                        let isGarbled = !keys.some(k => k.includes('申请') || k.includes('专利') || k.includes('号'));
-
-                        if (isGarbled) {
-                            Papa.parse(uploadedFiles[i], {
-                                header: true, skipEmptyLines: true, encoding: "UTF-8",
-                                complete: function (res) {
-                                    rawGlobalPatentDataset = rawGlobalPatentDataset.concat(res.data);
-                                    checkAndRender(++completeCount, uploadedFiles.length);
-                                }
-                            });
-                        } else {
-                            rawGlobalPatentDataset = rawGlobalPatentDataset.concat(parsedResults.data);
-                            checkAndRender(++completeCount, uploadedFiles.length);
-                        }
-                    }
-                });
+    fetch('patent.csv')
+        .then(response => response.arrayBuffer())
+        .then(buffer => {
+            // 先尝试 UTF-8 解码（fatal 模式会在遇到无效字节时抛异常），失败则回退 GBK
+            let csvText;
+            try {
+                csvText = new TextDecoder('utf-8', { fatal: true }).decode(buffer);
+            } catch (e) {
+                csvText = new TextDecoder('gbk').decode(buffer);
             }
-        });
-    }
-});
 
-function checkAndRender(current, total) {
-    if (current === total) {
-        if (rawGlobalPatentDataset.length === 0) {
-            alert("未能成功解析出任何数据，请检查CSV格式！");
+            // 用已正确解码的文本交给 PapaParse 解析
+            const parsed = Papa.parse(csvText, {
+                header: true,
+                skipEmptyLines: true
+            });
+
+            if (parsed.data && parsed.data.length > 0) {
+                rawGlobalPatentDataset = parsed.data;
+                console.log(`已从 patent.csv 加载 ${rawGlobalPatentDataset.length} 条数据`);
+                executeCoreDataPipeline();
+            } else {
+                console.error('patent.csv 解析结果为空');
+                document.getElementById('globalLoadingNotice').style.display = 'none';
+                alert('patent.csv 解析结果为空，请检查文件格式。');
+            }
+        })
+        .catch(err => {
+            console.error('加载 patent.csv 失败:', err);
             document.getElementById('globalLoadingNotice').style.display = 'none';
-            return;
-        }
-        executeCoreDataPipeline();
-    }
-}
+            alert('无法加载 patent.csv 数据文件，请确保该文件存在于项目根目录。\n错误: ' + err.message);
+        });
+});
