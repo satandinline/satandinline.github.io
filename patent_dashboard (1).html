@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>机器人专利创新全景分析</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-deep:      #0e0d0b;
+            --bg-parchment: #12100d;
+            --bg-card:      #1a1712;
+            --bg-card2:     #1f1d18;
+            --border-ink:   rgba(180, 148, 80, 0.22);
+            --border-warm:  rgba(180, 148, 80, 0.45);
+            --text-primary: #f0e8d6;
+            --text-secondary: #8a7d65;
+            --text-muted:   #5a5040;
+            --gold:         #c8973c;
+            --gold-light:   #e8b55a;
+            --gold-dim:     rgba(200, 151, 60, 0.15);
+            --red-seal:     #c04030;
+            --red-seal-dim: rgba(192, 64, 48, 0.15);
+            --jade:         #4a8a6a;
+            --jade-dim:     rgba(74, 138, 106, 0.15);
+            --ink-blue:     #3a5a8a;
+            --ink-blue-dim: rgba(58, 90, 138, 0.15);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-deep);
+            background-image:
+                radial-gradient(ellipse 80% 60% at 50% 0%, rgba(40,32,20,0.8) 0%, transparent 70%),
+                repeating-linear-gradient(0deg, transparent, transparent 79px, rgba(180,148,80,0.03) 79px, rgba(180,148,80,0.03) 80px),
+                repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(180,148,80,0.03) 79px, rgba(180,148,80,0.03) 80px);
+            color: var(--text-primary);
+            font-family: 'Noto Sans SC', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* ── 顶栏 ── */
+        .top-navbar {
+            background: linear-gradient(180deg, #1a1510 0%, #0e0d0b 100%);
+            border-bottom: 1px solid var(--border-warm);
+            padding: 18px 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        .top-navbar::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, var(--gold) 30%, var(--gold) 70%, transparent 100%);
+            opacity: 0.3;
+        }
+        .navbar-left { display: flex; flex-direction: column; gap: 4px; }
+        .navbar-title {
+            margin: 0;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: var(--gold-light);
+        }
+        .navbar-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+        .navbar-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--gold-dim);
+            border: 1px solid var(--border-ink);
+            padding: 6px 14px;
+            border-radius: 2px;
+            font-size: 12px;
+            color: var(--gold);
+            letter-spacing: 1px;
+        }
+        .navbar-badge::before {
+            content: '◈';
+            font-size: 14px;
+        }
+
+        /* ── 标签页 ── */
+        .narrative-tabs {
+            display: flex;
+            justify-content: center;
+            background: #0f0e0b;
+            padding: 0;
+            gap: 0;
+            border-bottom: 1px solid var(--border-ink);
+            overflow-x: auto;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            border-right: 1px solid var(--border-ink);
+            color: var(--text-muted);
+            padding: 14px 28px;
+            cursor: pointer;
+            font-size: 13px;
+            font-family: 'Noto Sans SC', sans-serif;
+            letter-spacing: 1px;
+            transition: all 0.25s;
+            white-space: nowrap;
+            position: relative;
+        }
+        .tab-btn:first-child { border-left: 1px solid var(--border-ink); }
+        .tab-btn:hover { color: var(--gold-light); background: var(--gold-dim); }
+        .tab-btn.active {
+            color: var(--gold-light);
+            background: var(--gold-dim);
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--gold);
+        }
+
+        /* ── 主内容区 ── */
+        .main-content {
+            padding: 28px 32px;
+            min-height: calc(100vh - 120px);
+        }
+        .narrative-section { display: none; }
+        .narrative-section.active { display: block; }
+
+        /* ── 卡片 ── */
+        .dashboard-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-ink);
+            border-radius: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 4px; left: 4px; right: 4px; bottom: 4px;
+            border: 1px solid rgba(180, 148, 80, 0.07);
+            pointer-events: none;
+        }
+        .dashboard-card h3 {
+            margin: 0 0 14px 0;
+            font-size: 13px;
+            font-family: 'Noto Serif SC', serif;
+            color: var(--gold);
+            letter-spacing: 2px;
+            font-weight: 600;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-ink);
+        }
+        .canvas-wrapper {
+            flex-grow: 1;
+            position: relative;
+            height: 100%;
+            width: 100%;
+            min-height: 180px;
+        }
+
+        /* ── 第一幕布局 ── */
+        .hub-spoke-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px 1fr;
+            grid-template-rows: 300px 300px;
+            gap: 20px;
+        }
+        .hub-central-core {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+            align-self: center;
+            justify-self: center;
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle at 40% 40%, #2a2318 0%, #141008 100%);
+            border: 1px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 40px rgba(200,151,60,0.15), inset 0 0 40px rgba(0,0,0,0.5);
+            z-index: 10;
+            text-align: center;
+        }
+        .hub-central-core::before {
+            content: '';
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            border: 1px solid rgba(200,151,60,0.1);
+            pointer-events: none;
+        }
+
+        /* ── 第二幕 ── */
+        .map-layout-container {
+            display: grid;
+            grid-template-columns: 1.3fr 0.7fr;
+            gap: 20px;
+            height: 580px;
+        }
+
+        /* ── 第三/四幕 ── */
+        .split-network-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            height: 620px;
+        }
+        .network-svg-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-ink);
+            overflow: hidden;
+            position: relative;
+        }
+        .insight-panel {
+            background: var(--bg-card2);
+            border: 1px solid var(--border-ink);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            overflow-y: auto;
+        }
+        .insight-panel h3 {
+            margin: 0;
+            font-family: 'Noto Serif SC', serif;
+            font-size: 14px;
+            color: var(--gold);
+            letter-spacing: 2px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-ink);
+        }
+
+        /* ── 叙事段落 ── */
+        .act-intro {
+            background: var(--bg-card2);
+            border-left: 3px solid var(--gold);
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            letter-spacing: 0.5px;
+        }
+        .act-intro strong { color: var(--gold-light); }
+
+        /* ── tooltip ── */
+        .tooltip {
+            position: absolute;
+            padding: 8px 12px;
+            font-size: 12px;
+            background: rgba(20, 16, 8, 0.95);
+            color: var(--text-primary);
+            border: 1px solid var(--border-warm);
+            border-radius: 0;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 100;
+            letter-spacing: 0.5px;
+        }
+        .map-province-path {
+            stroke: #0e0d0b;
+            stroke-width: 1;
+            cursor: pointer;
+            transition: fill 0.2s;
+        }
+
+        /* ── 数值统计块 ── */
+        .stat-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .stat-item {
+            flex: 1;
+            background: var(--bg-card2);
+            border: 1px solid var(--border-ink);
+            padding: 14px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .stat-label { font-size: 11px; color: var(--text-muted); letter-spacing: 1px; }
+        .stat-value { font-size: 28px; font-weight: 700; font-family: 'Noto Serif SC', serif; }
+        .stat-note  { font-size: 11px; color: var(--text-muted); }
+
+        /* ── 第五幕网格 ── */
+        .act5-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top-navbar">
+        <div class="navbar-left">
+            <h1 class="navbar-title">机器人专利创新全景分析</h1>
+            <span class="navbar-sub">ROBOT PATENT INTELLIGENCE DASHBOARD · 2015–2024</span>
+        </div>
+        <div class="navbar-badge">数据截至 2024 年 · 共收录 2,847 件</div>
+    </div>
+
+    <div class="narrative-tabs">
+        <button class="tab-btn active"  onclick="switchNarrativeAct(1)">一、全景概览</button>
+        <button class="tab-btn"         onclick="switchNarrativeAct(2)">二、地理分布</button>
+        <button class="tab-btn"         onclick="switchNarrativeAct(3)">三、技术图谱</button>
+        <button class="tab-btn"         onclick="switchNarrativeAct(4)">四、主体竞争</button>
+        <button class="tab-btn"         onclick="switchNarrativeAct(5)">五、价值评估</button>
+    </div>
+
+    <div id="mainDashboardView" class="main-content">
+
+        <!-- 幕一：全景概览 -->
+        <div id="narrativeAct1" class="narrative-section active">
+            <div class="act-intro">
+                过去十年，机器人领域专利申请量年均增长约 <strong>18.4%</strong>，已从制造业外围走向人机协作、医疗手术、自动驾驶等核心场景。本批次收录 <strong>2,847 件</strong>有效专利，授权率约 <strong>62%</strong>，技术集中度持续向头部机构聚拢。
+            </div>
+            <div class="hub-spoke-grid">
+                <div class="hub-central-core">
+                    <span style="color:var(--text-muted); font-size:12px; letter-spacing:2px;">有效专利总量</span>
+                    <div id="metricTotalCount" style="font-size:52px; font-weight:700; color:var(--gold); font-family:'Noto Serif SC',serif; line-height:1.1;">2,847</div>
+                    <span id="metricSubDateRange" style="color:var(--text-muted); font-size:11px; letter-spacing:1px; margin-top:4px;">2015 — 2024</span>
+                </div>
+                <div class="dashboard-card" style="grid-column:1; grid-row:1;">
+                    <h3>法律状态分布</h3>
+                    <div class="canvas-wrapper"><canvas id="chartAct1GrantRate"></canvas></div>
+                </div>
+                <div class="dashboard-card" style="grid-column:1; grid-row:2;">
+                    <h3>高价值资产池</h3>
+                    <div style="display:flex; align-items:center; justify-content:space-around; height:100%;">
+                        <div>
+                            <div id="metricHighValueCount" style="font-size:40px; font-weight:700; color:var(--gold); font-family:'Noto Serif SC',serif;">412</div>
+                            <div id="metricHighValueRatio" style="font-size:12px; color:var(--text-muted); margin-top:4px;">占总量 14.5%</div>
+                            <div style="font-size:11px; color:var(--text-muted); margin-top:8px; line-height:1.6;">综合引用次数、<br>同族数量与授权状态<br>加权筛选</div>
+                        </div>
+                        <div style="width:110px; height:110px;"><canvas id="chartAct1HighValueArc"></canvas></div>
+                    </div>
+                </div>
+                <div class="dashboard-card" style="grid-column:3; grid-row:1;">
+                    <h3>技术主题分布（Top 6）</h3>
+                    <div class="canvas-wrapper"><canvas id="chartAct1TechRose"></canvas></div>
+                </div>
+                <div class="dashboard-card" style="grid-column:3; grid-row:2;">
+                    <h3>申请量城市排名 TOP 5</h3>
+                    <div class="canvas-wrapper"><canvas id="chartAct1CityBar"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 幕二：地理分布 -->
+        <div id="narrativeAct2" class="narrative-section">
+            <div class="act-intro">
+                专利申请在地理上呈现<strong>显著集聚</strong>——广东、江苏、北京三地合计占全国申请量的 <strong>54%</strong>，与制造业基础及高校科研资源高度吻合。在国际布局方面，CN 受理局主导，PCT 路径占比已升至约 <strong>11%</strong>，反映出头部机构的出海意图。
+            </div>
+            <div class="map-layout-container">
+                <div class="dashboard-card">
+                    <h3>全国省域申请热度（鼠标悬停查看详情）</h3>
+                    <div class="canvas-wrapper" style="border:none;">
+                        <svg id="offlineChinaMapSvg" width="100%" height="100%" viewBox="0 0 600 500"></svg>
+                    </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:20px;">
+                    <div class="dashboard-card" style="flex:1;">
+                        <h3>受理局分布</h3>
+                        <div class="canvas-wrapper"><canvas id="chartAct2GlobalPie"></canvas></div>
+                    </div>
+                    <div class="dashboard-card" style="flex:1;">
+                        <h3>主要受理局申请量对比</h3>
+                        <div class="canvas-wrapper"><canvas id="chartAct2GlobalBar"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 幕三：技术图谱 -->
+        <div id="narrativeAct3" class="narrative-section">
+            <div class="act-intro">
+                IPC 分类标签的共现关系揭示了技术融合的真实走向。<strong>B25J（机械手）</strong>与 <strong>G05B（控制系统）</strong>构成当前最密集的耦合带，说明"运动控制"已成为跨赛道的底层基础设施。新兴的 <strong>A61B（医疗器械）</strong>节点正在快速与传感、视觉领域建立连接。
+            </div>
+            <div class="split-network-container">
+                <div class="network-svg-container">
+                    <svg id="act3TechNetworkSvg" width="100%" height="100%"></svg>
+                </div>
+                <div class="insight-panel">
+                    <h3>技术共现说明</h3>
+                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.8;">
+                        节点大小代表该 IPC 分类在数据集中出现的频次。两个节点之间的连线表示同一件专利同时引用了这两个技术分类——连线越粗，说明两者在实际申请中<strong style="color:var(--gold-light);">协同出现的次数越多</strong>，技术关联性越强。
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:8px; font-size:12px; color:var(--text-muted);">
+                        <div>── 细线：偶发交叉</div>
+                        <div style="color:var(--red-seal);">── 粗线：高频绑定</div>
+                    </div>
+                    <hr style="border:0; border-top:1px solid var(--border-ink); margin:4px 0;">
+                    <div id="techInsightContent" style="font-size:12px; color:var(--text-secondary); line-height:1.7;">
+                        点击任意节点查看详情
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 幕四：主体竞争 -->
+        <div id="narrativeAct4" class="narrative-section">
+            <div class="act-intro">
+                头部申请机构之间的竞争格局已相对固化，但仍有结构性变化：<strong>高校系</strong>凭借基础研究优势在传感与算法领域持续发力，<strong>产业系</strong>则在运动控制与整机集成方向快速收拢专利。两节点间连线表示其主力技术领域存在<strong>直接重叠</strong>。
+            </div>
+            <div class="split-network-container">
+                <div class="network-svg-container">
+                    <svg id="act4AssigneeNetworkSvg" width="100%" height="100%"></svg>
+                </div>
+                <div class="insight-panel">
+                    <h3>竞争主体说明</h3>
+                    <div style="font-size:12px; color:var(--text-secondary); line-height:1.8;">
+                        节点大小正比于机构持有的专利数量。连线意味着两家机构在<strong style="color:var(--gold-light);">同一 IPC 细分领域</strong>均有大量布局，属于直接竞争关系。连线颜色越深，竞争烈度越高。
+                    </div>
+                    <hr style="border:0; border-top:1px solid var(--border-ink); margin:4px 0;">
+                    <div id="assigneeInsightContent" style="font-size:12px; color:var(--text-secondary); line-height:1.7;">
+                        点击节点查看机构详情
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 幕五：价值评估 -->
+        <div id="narrativeAct5" class="narrative-section">
+            <div class="act-intro">
+                价值评分基于三项加权指标：<strong>授权状态（30分）</strong>、<strong>被引次数（最高40分）</strong>、<strong>同族数量（最高18分）</strong>，满分88分。得分≥45分归为高价值资产。与此同时，约 <strong>8.3%</strong> 的专利已进入过期或失效状态，资产运营需重点关注临期预警区间。
+            </div>
+            <div class="act5-grid">
+                <div class="dashboard-card" style="height:460px;">
+                    <h3>高价值资产分层分布</h3>
+                    <div class="canvas-wrapper"><canvas id="chartAct5ValueFeature"></canvas></div>
+                </div>
+                <div class="dashboard-card" style="height:460px;">
+                    <h3>资产生命周期风险分布</h3>
+                    <div class="canvas-wrapper"><canvas id="chartAct5RiskMonitor"></canvas></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="globalTooltip" class="tooltip"></div>
+
+    <script>
+    // ═══════════════════════════════════════════════════
+    //  内嵌演示数据集（模拟2,847件机器人专利）
+    // ═══════════════════════════════════════════════════
+    const DEMO_METRICS = {
+        totalCount: 2847,
+        minYear: 2015,
+        maxYear: 2024,
+        highValueCount: 412,
+        legalStatusStats: { '授权': 1765, '审查中': 612, '驳回/撤回': 238, '失效/放弃': 232 },
+        cityRanking: { '深圳': 387, '北京': 356, '上海': 312, '武汉': 198, '杭州': 174, '南京': 152, '广州': 143, '西安': 128 },
+        provinceRanking: {
+            '广东': 520, '北京': 380, '江苏': 360, '浙江': 290, '上海': 270,
+            '湖北': 210, '陕西': 175, '山东': 160, '安徽': 130, '四川': 120,
+            '福建': 100, '河南': 95, '湖南': 90, '天津': 80, '重庆': 75,
+            '辽宁': 65, '吉林': 42, '黑龙江': 35, '河北': 55, '山西': 40,
+            '甘肃': 28, '宁夏': 15, '青海': 12, '新疆': 18, '西藏': 6,
+            '内蒙古': 22, '江西': 68, '广西': 48, '贵州': 32, '云南': 25,
+            '海南': 18, '台湾': 30
+        },
+        globalRanking: { 'CN': 2520, 'US': 108, 'WO': 96, 'EP': 72, 'JP': 51 },
+        techThemeClustering: {
+            'B25J（机械手臂）': 698,
+            'G05B（控制系统）': 562,
+            'G05D（自动控制）': 421,
+            'B62D（车辆底盘）': 338,
+            'A61B（医疗器械）': 287,
+            'G06T（图像处理）': 245,
+            'H04W（无线通信）': 198,
+            'G01S（测距传感）': 176,
+        },
+        assigneeRanking: {
+            '华中科技大学': 186, '哈尔滨工业大学': 172, '浙江大学': 158,
+            '北京理工大学': 143, '中国科学院': 137, '深圳优必选': 124,
+            '美的集团': 118, '沈阳新松机器人': 112, '大疆创新': 107,
+            '科大讯飞': 98, '广州数控': 92, '埃夫特智能装备': 87,
+        },
+        techCoOccurrenceMatrix: {
+            'B25J（机械手臂）|G05B（控制系统）': 312,
+            'B25J（机械手臂）|G05D（自动控制）': 198,
+            'G05B（控制系统）|G05D（自动控制）': 245,
+            'B62D（车辆底盘）|G05D（自动控制）': 186,
+            'A61B（医疗器械）|B25J（机械手臂）': 142,
+            'G06T（图像处理）|G01S（测距传感）': 168,
+            'G06T（图像处理）|G05D（自动控制）': 134,
+            'H04W（无线通信）|G05B（控制系统）': 98,
+        },
+        assigneeCoMatrix: {
+            '华中科技大学|哈尔滨工业大学': 1, '华中科技大学|浙江大学': 1,
+            '哈尔滨工业大学|北京理工大学': 1, '浙江大学|中国科学院': 1,
+            '深圳优必选|美的集团': 1, '沈阳新松机器人|埃夫特智能装备': 1,
+            '大疆创新|深圳优必选': 1, '科大讯飞|大疆创新': 1,
+        },
+        valueScoreDistribution: { high: 412, mid: 1638, low: 797 },
+        riskDistribution: { expired: 236, critical: 318, normal: 2293 }
+    };
+
+    const assigneeTechFocus = {
+        '华中科技大学': { 'B25J（机械手臂）': 1 },
+        '哈尔滨工业大学': { 'B25J（机械手臂）': 1 },
+        '浙江大学': { 'G05B（控制系统）': 1 },
+        '北京理工大学': { 'G05B（控制系统）': 1 },
+        '中国科学院': { 'G05D（自动控制）': 1 },
+        '深圳优必选': { 'B25J（机械手臂）': 1 },
+        '美的集团': { 'B25J（机械手臂）': 1 },
+        '沈阳新松机器人': { 'G05B（控制系统）': 1 },
+        '大疆创新': { 'G01S（测距传感）': 1 },
+        '科大讯飞': { 'H04W（无线通信）': 1 },
+        '广州数控': { 'G05D（自动控制）': 1 },
+        '埃夫特智能装备': { 'G05B（控制系统）': 1 },
+    };
+
+    // ═══════════════════════════════════════════════════
+    //  中国省级 SVG 路径数据
+    // ═══════════════════════════════════════════════════
+    const OFFLINE_GEO_DATA = {
+        "广东": "M395,395 L415,395 L425,405 L415,415 L390,412 L380,402 Z",
+        "北京": "M420,185 L435,185 L435,195 L420,195 Z",
+        "上海": "M475,285 L485,285 L485,295 L475,295 Z",
+        "浙江": "M460,300 L475,300 L480,320 L465,330 L455,315 Z",
+        "江苏": "M455,265 L475,270 L475,290 L455,290 L445,275 Z",
+        "山东": "M430,225 L460,225 L465,245 L445,255 L425,240 Z",
+        "湖北": "M390,295 L425,295 L430,315 L405,325 L390,310 Z",
+        "湖南": "M390,330 L415,330 L420,360 L395,365 L385,345 Z",
+        "四川": "M310,295 L350,295 L355,335 L325,345 L310,320 Z",
+        "福建": "M440,345 L460,345 L455,375 L435,375 L430,355 Z",
+        "安徽": "M440,275 L455,275 L455,305 L435,305 Z",
+        "河南": "M395,245 L430,245 L430,275 L395,275 Z",
+        "河北": "M415,170 L440,170 L435,215 L415,215 Z",
+        "陕西": "M365,235 L390,235 L390,285 L365,285 Z",
+        "辽宁": "M460,150 L485,155 L480,180 L455,175 Z",
+        "黑龙江": "M480,70 L520,90 L500,130 L465,110 Z",
+        "吉林": "M475,120 L505,130 L495,160 L465,145 Z",
+        "内蒙古": "M310,140 L440,165 L410,195 L340,185 Z",
+        "山西": "M395,200 L415,200 L410,240 L392,240 Z",
+        "甘肃": "M290,210 L350,245 L340,275 L280,240 Z",
+        "宁夏": "M350,220 L365,220 L365,245 L350,245 Z",
+        "青海": "M240,230 L300,240 L290,285 L230,270 Z",
+        "新疆": "M120,130 L220,170 L200,260 L100,210 Z",
+        "西藏": "M130,265 L250,285 L230,350 L120,320 Z",
+        "重庆": "M355,300 L380,300 L380,325 L355,325 Z",
+        "贵州": "M345,340 L375,340 L370,370 L340,370 Z",
+        "云南": "M295,355 L335,360 L325,410 L285,395 Z",
+        "广西": "M345,385 L380,385 L385,415 L350,415 Z",
+        "江西": "M425,325 L445,325 L440,365 L420,365 Z",
+        "海南": "M390,440 L410,440 L410,455 L390,455 Z",
+        "台湾": "M465,370 L480,370 L475,400 L460,400 Z",
+        "天津": "M430,195 L442,195 L442,205 L430,205 Z"
+    };
+
+    // ═══════════════════════════════════════════════════
+    //  工具函数 & 渲染逻辑
+    // ═══════════════════════════════════════════════════
+    let loadedChartsInstances = {};
+
+    const PALETTE = {
+        gold:    '#c8973c',
+        goldLight: '#e8b55a',
+        jade:    '#4a8a6a',
+        red:     '#c04030',
+        blue:    '#3a5a8a',
+        muted:   '#5a5040',
+        border:  '#2a2520',
+        bg:      '#1a1712',
+    };
+
+    const CHART_DEFAULTS = {
+        color: '#8a7d65',
+        gridColor: 'rgba(180,148,80,0.07)',
+    };
+
+    function clearCanvas(id) {
+        if (loadedChartsInstances[id]) {
+            loadedChartsInstances[id].destroy();
+            delete loadedChartsInstances[id];
+        }
+    }
+
+    function switchNarrativeAct(actId) {
+        document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', (i + 1) === actId));
+        document.querySelectorAll('.narrative-section').forEach((s, i) => s.classList.toggle('active', (i + 1) === actId));
+        setTimeout(() => renderAct(actId), 60);
+    }
+
+    function renderAct(actId) {
+        const m = DEMO_METRICS;
+
+        if (actId === 1) {
+            document.getElementById('metricTotalCount').innerText = m.totalCount.toLocaleString();
+            document.getElementById('metricSubDateRange').innerText = `${m.minYear} — ${m.maxYear}`;
+            document.getElementById('metricHighValueCount').innerText = m.highValueCount.toLocaleString();
+            let pct = ((m.highValueCount / m.totalCount) * 100).toFixed(1);
+            document.getElementById('metricHighValueRatio').innerText = `占总量 ${pct}%`;
+
+            clearCanvas('chartAct1GrantRate');
+            loadedChartsInstances['chartAct1GrantRate'] = new Chart(
+                document.getElementById('chartAct1GrantRate').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(m.legalStatusStats),
+                    datasets: [{
+                        data: Object.values(m.legalStatusStats),
+                        backgroundColor: [PALETTE.jade, PALETTE.blue, PALETTE.red, PALETTE.muted],
+                        borderWidth: 2,
+                        borderColor: PALETTE.bg
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { color: CHART_DEFAULTS.color, font: { size: 11 } } } }
+                }
+            });
+
+            clearCanvas('chartAct1HighValueArc');
+            loadedChartsInstances['chartAct1HighValueArc'] = new Chart(
+                document.getElementById('chartAct1HighValueArc').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [m.highValueCount, m.totalCount - m.highValueCount],
+                        backgroundColor: [PALETTE.gold, '#1a1712'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '80%',
+                    plugins: { tooltip: { enabled: false } }
+                }
+            });
+
+            clearCanvas('chartAct1TechRose');
+            let sortedTech = Object.entries(m.techThemeClustering).sort((a, b) => b[1] - a[1]).slice(0, 6);
+            loadedChartsInstances['chartAct1TechRose'] = new Chart(
+                document.getElementById('chartAct1TechRose').getContext('2d'), {
+                type: 'polarArea',
+                data: {
+                    labels: sortedTech.map(x => x[0].split('（')[0]),
+                    datasets: [{
+                        data: sortedTech.map(x => x[1]),
+                        backgroundColor: [
+                            'rgba(200,151,60,0.55)', 'rgba(74,138,106,0.55)',
+                            'rgba(58,90,138,0.55)',  'rgba(192,64,48,0.55)',
+                            'rgba(138,125,101,0.55)','rgba(180,148,80,0.35)'
+                        ],
+                        borderColor: PALETTE.border, borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { r: { ticks: { display: false }, grid: { color: CHART_DEFAULTS.gridColor } } },
+                    plugins: { legend: { position: 'right', labels: { color: CHART_DEFAULTS.color, font: { size: 10 } } } }
+                }
+            });
+
+            clearCanvas('chartAct1CityBar');
+            let sortedCity = Object.entries(m.cityRanking).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            loadedChartsInstances['chartAct1CityBar'] = new Chart(
+                document.getElementById('chartAct1CityBar').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: sortedCity.map(x => x[0]),
+                    datasets: [{ data: sortedCity.map(x => x[1]), backgroundColor: PALETTE.gold, borderRadius: 0 }]
+                },
+                options: {
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { color: CHART_DEFAULTS.color }, grid: { color: CHART_DEFAULTS.gridColor } },
+                        y: { ticks: { color: CHART_DEFAULTS.color }, grid: { display: false } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        if (actId === 2) {
+            const svg = d3.select("#offlineChinaMapSvg");
+            svg.selectAll("*").remove();
+            const tooltip = d3.select("#globalTooltip");
+
+            let counts = Object.values(m.provinceRanking);
+            let maxVal = Math.max(...counts, 5);
+            let colorScale = d3.scaleLinear()
+                .domain([0, Math.log10(maxVal)])
+                .range(["#1a1510", PALETTE.gold]);
+
+            Object.entries(OFFLINE_GEO_DATA).forEach(([provName, pathStr]) => {
+                let count = m.provinceRanking[provName] || 0;
+                let fillColor = count === 0 ? "#141008" : colorScale(Math.log10(Math.max(count, 1)));
+                svg.append("path")
+                    .attr("d", pathStr)
+                    .attr("class", "map-province-path")
+                    .attr("fill", fillColor)
+                    .attr("stroke", "#0e0d0b")
+                    .on("mouseover", function (event) {
+                        d3.select(this).attr("stroke", PALETTE.goldLight).attr("stroke-width", 2);
+                        tooltip.style("opacity", 1)
+                            .html(`<strong>${provName}</strong><br/>申请数：${count} 件`);
+                    })
+                    .on("mousemove", function (event) {
+                        tooltip.style("left", (event.pageX + 14) + "px").style("top", (event.pageY - 18) + "px");
+                    })
+                    .on("mouseleave", function () {
+                        d3.select(this).attr("fill", fillColor).attr("stroke", "#0e0d0b").attr("stroke-width", 1);
+                        tooltip.style("opacity", 0);
+                    });
+            });
+
+            clearCanvas('chartAct2GlobalPie');
+            let gbData = Object.entries(m.globalRanking).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            let gbLabels = { CN: '中国', US: '美国', WO: 'PCT/WIPO', EP: '欧洲专利局', JP: '日本' };
+            loadedChartsInstances['chartAct2GlobalPie'] = new Chart(
+                document.getElementById('chartAct2GlobalPie').getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: gbData.map(x => gbLabels[x[0]] || x[0]),
+                    datasets: [{
+                        data: gbData.map(x => x[1]),
+                        backgroundColor: [PALETTE.gold, PALETTE.jade, PALETTE.blue, PALETTE.red, PALETTE.muted],
+                        borderWidth: 2, borderColor: PALETTE.bg
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { color: CHART_DEFAULTS.color, font: { size: 11 } } } }
+                }
+            });
+
+            clearCanvas('chartAct2GlobalBar');
+            loadedChartsInstances['chartAct2GlobalBar'] = new Chart(
+                document.getElementById('chartAct2GlobalBar').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: gbData.map(x => gbLabels[x[0]] || x[0]),
+                    datasets: [{ data: gbData.map(x => x[1]), backgroundColor: PALETTE.jade, borderRadius: 0 }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { color: CHART_DEFAULTS.color }, grid: { display: false } },
+                        y: { ticks: { color: CHART_DEFAULTS.color }, grid: { color: CHART_DEFAULTS.gridColor } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        if (actId === 3) {
+            const svgEl = d3.select("#act3TechNetworkSvg");
+            svgEl.selectAll("*").remove();
+            const mainG = svgEl.append("g");
+            svgEl.call(d3.zoom().scaleExtent([0.3, 4]).on("zoom", (e) => mainG.attr("transform", e.transform)));
+
+            let topTechs = Object.entries(m.techThemeClustering).sort((a, b) => b[1] - a[1]).slice(0, 18);
+            let nodes = topTechs.map((t, i) => ({ id: t[0], size: t[1], group: i % 4 }));
+            let nodeSet = new Set(nodes.map(n => n.id));
+            let links = [];
+            Object.entries(m.techCoOccurrenceMatrix).forEach(([key, val]) => {
+                let parts = key.split("|");
+                if (nodeSet.has(parts[0]) && nodeSet.has(parts[1]))
+                    links.push({ source: parts[0], target: parts[1], value: val });
+            });
+            if (links.length === 0 && nodes.length > 1)
+                for (let k = 0; k < nodes.length - 1; k++)
+                    links.push({ source: nodes[k].id, target: nodes[k + 1].id, value: 5 });
+
+            const sim = d3.forceSimulation(nodes)
+                .force("link", d3.forceLink(links).id(d => d.id).distance(120))
+                .force("charge", d3.forceManyBody().strength(-220))
+                .force("center", d3.forceCenter(350, 280))
+                .force("collide", d3.forceCollide().radius(38));
+
+            const nodeColors = [PALETTE.gold, PALETTE.jade, PALETTE.blue, PALETTE.red];
+
+            const link = mainG.append("g").selectAll("line").data(links).join("line")
+                .attr("stroke", d => d.value > 200 ? 'rgba(192,64,48,0.75)' : 'rgba(200,151,60,0.25)')
+                .attr("stroke-width", d => Math.max(1, Math.sqrt(d.value / 30)));
+
+            const node = mainG.append("g").selectAll("g").data(nodes).join("g")
+                .attr("cursor", "pointer")
+                .on("click", function (event, d) {
+                    let linkedTotal = links.filter(l => l.source.id === d.id || l.target.id === d.id).length;
+                    document.getElementById("techInsightContent").innerHTML = `
+                        <div style="padding:12px; background:rgba(200,151,60,0.06); border-left:2px solid ${PALETTE.gold};">
+                            <div style="color:${PALETTE.goldLight}; font-weight:600; margin-bottom:8px;">${d.id}</div>
+                            <div style="color:var(--text-muted); line-height:1.8;">
+                                数据集收录量：<span style="color:${PALETTE.goldLight}; font-weight:600;">${d.size}</span> 件<br>
+                                技术关联数：<span style="color:${PALETTE.gold};">${linkedTotal}</span> 个分支
+                            </div>
+                        </div>`;
+                });
+
+            node.append("circle")
+                .attr("r", d => Math.min(20, 8 + Math.sqrt(d.size / 5)))
+                .attr("fill", d => nodeColors[d.group])
+                .attr("fill-opacity", 0.85)
+                .attr("stroke", "#0e0d0b").attr("stroke-width", 1.5);
+            node.append("text")
+                .attr("dy", 3).attr("text-anchor", "middle")
+                .text(d => d.id.split('（')[0].substring(0, 4))
+                .attr("fill", "#f0e8d6")
+                .style("font-size", "9px").style("pointer-events", "none");
+
+            sim.on("tick", () => {
+                link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+                    .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+                node.attr("transform", d => `translate(${d.x},${d.y})`);
+            });
+        }
+
+        if (actId === 4) {
+            const svgEl = d3.select("#act4AssigneeNetworkSvg");
+            svgEl.selectAll("*").remove();
+            const mainG = svgEl.append("g");
+            svgEl.call(d3.zoom().scaleExtent([0.3, 4]).on("zoom", (e) => mainG.attr("transform", e.transform)));
+
+            let topCos = Object.entries(m.assigneeRanking).sort((a, b) => b[1] - a[1]).slice(0, 14);
+            let nodes = topCos.map(t => ({ id: t[0], size: t[1] }));
+            let nodeSet = new Set(nodes.map(n => n.id));
+            let links = [];
+            Object.entries(m.assigneeCoMatrix).forEach(([key, val]) => {
+                let parts = key.split("|");
+                if (nodeSet.has(parts[0]) && nodeSet.has(parts[1]))
+                    links.push({ source: parts[0], target: parts[1], value: val });
+            });
+            if (links.length === 0 && nodes.length > 1)
+                for (let k = 0; k < nodes.length - 1; k++)
+                    links.push({ source: nodes[k].id, target: nodes[k + 1].id, value: 5 });
+
+            const sim = d3.forceSimulation(nodes)
+                .force("link", d3.forceLink(links).id(d => d.id).distance(145))
+                .force("charge", d3.forceManyBody().strength(-280))
+                .force("center", d3.forceCenter(350, 280))
+                .force("collide", d3.forceCollide().radius(48));
+
+            const link = mainG.append("g").selectAll("line").data(links).join("line")
+                .attr("stroke", 'rgba(200,151,60,0.5)').attr("stroke-width", 2);
+
+            const node = mainG.append("g").selectAll("g").data(nodes).join("g")
+                .attr("cursor", "pointer")
+                .on("click", function (event, d) {
+                    let primaryTech = Object.keys(assigneeTechFocus[d.id] || {})[0] || '暂无分类';
+                    document.getElementById("assigneeInsightContent").innerHTML = `
+                        <div style="padding:12px; background:rgba(74,138,106,0.06); border-left:2px solid ${PALETTE.jade};">
+                            <div style="color:${PALETTE.goldLight}; font-weight:600; margin-bottom:8px;">${d.id}</div>
+                            <div style="color:var(--text-muted); line-height:1.8;">
+                                持有专利：<span style="color:${PALETTE.gold}; font-weight:600;">${d.size}</span> 件<br>
+                                主力技术：<span style="color:${PALETTE.jade};">${primaryTech}</span>
+                            </div>
+                        </div>`;
+                });
+
+            node.append("circle")
+                .attr("r", d => Math.min(24, 10 + Math.sqrt(d.size / 3)))
+                .attr("fill", PALETTE.jade).attr("fill-opacity", 0.8)
+                .attr("stroke", "#0e0d0b").attr("stroke-width", 1.5);
+            node.append("text")
+                .attr("dy", -4).attr("text-anchor", "middle")
+                .text(d => d.id.length > 5 ? d.id.substring(0, 4) + '…' : d.id)
+                .attr("fill", "#f0e8d6").style("font-size", "9px").style("pointer-events", "none");
+
+            sim.on("tick", () => {
+                link.attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+                    .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+                node.attr("transform", d => `translate(${d.x},${d.y})`);
+            });
+        }
+
+        if (actId === 5) {
+            clearCanvas('chartAct5ValueFeature');
+            loadedChartsInstances['chartAct5ValueFeature'] = new Chart(
+                document.getElementById('chartAct5ValueFeature').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['高价值（≥45分）', '中等价值（20–44分）', '基础资产（<20分）'],
+                    datasets: [{
+                        data: [m.valueScoreDistribution.high, m.valueScoreDistribution.mid, m.valueScoreDistribution.low],
+                        backgroundColor: [PALETTE.gold, PALETTE.blue, PALETTE.muted],
+                        borderRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: CHART_DEFAULTS.color }, grid: { display: false } },
+                        y: { ticks: { color: CHART_DEFAULTS.color }, grid: { color: CHART_DEFAULTS.gridColor } }
+                    }
+                }
+            });
+
+            clearCanvas('chartAct5RiskMonitor');
+            loadedChartsInstances['chartAct5RiskMonitor'] = new Chart(
+                document.getElementById('chartAct5RiskMonitor').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['已到期／失效', '3年内临期预警', '正常运营中'],
+                    datasets: [{
+                        data: [m.riskDistribution.expired, m.riskDistribution.critical, m.riskDistribution.normal],
+                        backgroundColor: [PALETTE.red, '#d4763a', PALETTE.jade],
+                        borderWidth: 2, borderColor: PALETTE.bg
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { color: CHART_DEFAULTS.color, font: { size: 12 } } } }
+                }
+            });
+        }
+    }
+
+    // 页面就绪后直接渲染第一幕
+    window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => renderAct(1), 80);
+    });
+    </script>
+</body>
+</html>
