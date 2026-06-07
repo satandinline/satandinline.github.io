@@ -187,8 +187,8 @@ function renderAct1() {
                 pointBackgroundColor: '#0284c7',
                 pointBorderColor: '#ffffff',
                 pointBorderWidth: 2,
-                pointRadius: 5,
-                pointHoverRadius: 7,
+                pointRadius: 8,
+                pointHoverRadius: 11,
                 pointHoverBackgroundColor: '#0369a1',
                 fill: true
             }]
@@ -242,18 +242,25 @@ function renderAct1() {
         }
     });
 
-    // ========== 4. 创新地市排行 TOP 5 柱状图（渐变+数据标签） ==========
+    // ========== 4. 创新地市排行 TOP 5 水平条形图（渐变+数据标签） ==========
     clearCanvas('chartAct1CityBar');
     let sortedCity = Object.entries(globalProcessedMetrics.cityRanking).sort((a, b) => b[1] - a[1]).slice(0, 5);
     const cityCtx = document.getElementById('chartAct1CityBar').getContext('2d');
-    // 按排名创建从深到浅的垂直渐变色数组
+    // 按排名创建从深到浅的水平渐变色数组
     const cityBarColors = sortedCity.map((_, i) => {
-        const grad = cityCtx.createLinearGradient(0, cityCtx.canvas.height, 0, 0);
+        const grad = cityCtx.createLinearGradient(0, 0, cityCtx.canvas.width, 0);
         const alpha = 1 - i * 0.15;
-        grad.addColorStop(0, `rgba(2,132,199,${alpha})`);
-        grad.addColorStop(1, `rgba(56,189,248,${Math.max(alpha - 0.2, 0.3)})`);
+        grad.addColorStop(0, `rgba(2,132,199,${Math.max(alpha - 0.2, 0.3)})`);
+        grad.addColorStop(1, `rgba(56,189,248,${alpha})`);
         return grad;
     });
+
+    // 只为这个图表临时注册插件，不影响其他图表
+    let cityChartPlugins = [];
+    if (typeof ChartDataLabels !== 'undefined') {
+        cityChartPlugins.push(ChartDataLabels);
+    }
+
     loadedChartsInstances['chartAct1CityBar'] = new Chart(cityCtx, {
         type: 'bar',
         data: {
@@ -262,7 +269,7 @@ function renderAct1() {
                 data: sortedCity.map(x => x[1]),
                 backgroundColor: cityBarColors,
                 hoverBackgroundColor: sortedCity.map(() => {
-                    const grad = cityCtx.createLinearGradient(0, cityCtx.canvas.height, 0, 0);
+                    const grad = cityCtx.createLinearGradient(0, 0, cityCtx.canvas.width, 0);
                     grad.addColorStop(0, '#0369a1');
                     grad.addColorStop(1, '#38bdf8');
                     return grad;
@@ -273,20 +280,22 @@ function renderAct1() {
                 categoryPercentage: 0.8
             }]
         },
+        plugins: cityChartPlugins, // 只为这个图表添加插件
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            indexAxis: 'y', // 水平条形图
             scales: {
                 x: {
-                    ticks: { color: '#64748b', font: { size: 11, weight: '500' }, padding: 4, maxRotation: 0, minRotation: 0 },
-                    grid: { display: false },
-                    border: { display: false }
-                },
-                y: {
-                    ticks: { color: '#64748b', font: { size: 11 }, padding: 6 },
+                    ticks: { color: '#64748b', font: { size: 11, weight: '500' }, padding: 6 },
                     grid: { color: 'rgba(148,163,184,0.1)' },
                     border: { display: false },
                     beginAtZero: true
+                },
+                y: {
+                    ticks: { color: '#64748b', font: { size: 12, weight: '500' }, padding: 8, maxRotation: 0, minRotation: 0 },
+                    grid: { display: false },
+                    border: { display: false }
                 }
             },
             plugins: {
@@ -303,20 +312,21 @@ function renderAct1() {
                     displayColors: true,
                     boxPadding: 4,
                     callbacks: {
-                        label: function (ctx) { return ` ${ctx.label} ${ctx.parsed.y.toLocaleString()} 件`; }
+                        label: function (ctx) { return ` ${ctx.label} ${ctx.parsed.x.toLocaleString()} 件`; }
                     }
                 },
                 datalabels: {
-                    anchor: 'end',
-                    align: 'top',
-                    color: '#334155',
+                    display: true,
+                    anchor: 'center',
+                    align: 'center',
+                    color: '#ffffff',
                     font: { weight: 'bold', size: 11 },
                     rotation: 0,
                     clamp: true,
                     formatter: function (value, ctx) {
                         return value.toLocaleString();
                     },
-                    offset: 4
+                    offset: 0 // 居中显示
                 }
             }
         }
