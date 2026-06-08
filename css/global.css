@@ -88,41 +88,35 @@ body {
     min-height: calc(100vh - 140px);
     position: relative;
     z-index: 1;
-    background: var(--bg-deep);
 }
 
-/* 确保每个幕有独立的定位上下文 */
+/* 每一幕连续排列，间距拉开避免内容重叠 */
 .narrative-section {
     position: relative;
     z-index: 1;
     width: 100%;
-    margin-bottom: 60px;
-}
-
-.narrative-section.active {
+    margin-bottom: 80px;
     display: block;
-    z-index: 2;
-    /* 激活的幕层级更高 */
 }
 
-/* 全局卡片基础样式 */
+/* 卡片不再用白底框，直接平铺在背景上 */
 .dashboard-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-glow);
-    border-radius: 10px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
     padding: 14px 16px;
     display: flex;
     flex-direction: column;
     position: relative;
     z-index: 1;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    transition: box-shadow 0.25s ease, border-color 0.25s ease;
+    box-shadow: none;
+    transition: none;
 }
 
 .dashboard-card:hover {
-    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.12);
-    border-color: var(--cyan-accent);
-    cursor: pointer;
+    box-shadow: none;
+    border-color: transparent;
+    cursor: default;
 }
 
 .dashboard-card h3 {

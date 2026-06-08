@@ -1,4 +1,4 @@
-/* Act 1: 全景仪表盘专属样式 */
+/* Act 1 全景仪表盘样式 */
 
 .hub-spoke-grid {
     display: grid;
@@ -16,14 +16,14 @@
     justify-self: center;
     width: 240px;
     height: 240px;
-    background: #ffffff;
+    background: transparent;
     border: 2px solid var(--cyan-accent);
     border-radius: 50%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 2px 12px rgba(2, 132, 199, 0.1);
+    box-shadow: none;
     z-index: 10;
     text-align: center;
     position: relative;

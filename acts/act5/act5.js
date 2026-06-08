@@ -1,4 +1,4 @@
-// Act 5: 价值预警矩阵专属交互逻辑
+// Act 5 价值预警矩阵
 
 function renderAct5() {
     clearCanvas('chartAct5ValueFeature');

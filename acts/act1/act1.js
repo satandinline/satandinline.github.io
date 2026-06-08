@@ -1,4 +1,4 @@
-// Act 1: 全景仪表盘专属交互逻辑
+// Act 1 全景仪表盘
 
 function renderAct1() {
     // 更新核心指标
@@ -9,16 +9,14 @@ function renderAct1() {
     let pct = globalProcessedMetrics.totalCount > 0 ? ((globalProcessedMetrics.highValueCount / globalProcessedMetrics.totalCount) * 100).toFixed(1) : 0;
     document.getElementById('metricHighValueRatio').innerText = `高价值资产占比 ${pct}%`;
 
-    // ========== 1. 专利法律审查结构环形图（带百分比 + 点击筛选） ==========
+    // ========== 1. 法律状态环形图 ==========
     clearCanvas('chartAct1GrantRate');
     const legalLabels = Object.keys(globalProcessedMetrics.legalStatusStats);
     const legalValues = Object.values(globalProcessedMetrics.legalStatusStats);
     const legalTotal = legalValues.reduce((s, v) => s + v, 0);
-    // 为小扇区设置最小显示值，确保弧线在图上可见（最少占3%视觉弧度）
+    // 给小扇区设一个最小显示值，确保弧线看得见
     const minVisualPct = 0.03;
-    // 记录被筛选掉（划线/隐藏）的索引集合
     const hiddenSet = new Set();
-    // 记录当前高亮（hover）的索引
     let hoveredIdx = -1;
 
     function getVisibleTotal() {
@@ -33,7 +31,7 @@ function renderAct1() {
         });
     }
 
-    // 自定义插件：为被筛选掉的图例项绘制删除线
+    // 图例删除线插件：给被筛选掉的图例项画横线
     const legendStrikethroughPlugin = {
         id: 'legendStrikethrough',
         afterDraw(chart) {
@@ -128,10 +126,10 @@ function renderAct1() {
                                 const val = legalValues[i];
                                 const isHidden = hiddenSet.has(i);
                                 const isHovered = (i === hoveredIdx);
-                                // 被筛选掉的项不显示百分比
+                                // 被筛选掉的不显示百分比
                                 const pct = (!isHidden && visTotal > 0) ? ((val / visTotal) * 100).toFixed(1) : null;
                                 const pctStr = pct !== null ? `  ${pct}%` : '';
-                                // 被筛选掉的项文字变灰并加删除线效果（通过变灰+变浅色模拟）
+                                // 被筛选掉的文字变灰
                                 const fontColor = isHidden ? '#cbd5e1' : (isHovered ? dataset.backgroundColor[i] : '#334155');
                                 return {
                                     text: `${label}${pctStr}`,
@@ -266,12 +264,12 @@ function renderAct1() {
         }
     });
 
-    // ========== 3. 技术主题分布极区图（Top 6） ==========
+    // ========== 3. 技术主题分布极区图 ==========
     clearCanvas('chartAct1TechRose');
     let sortedTech = Object.entries(globalProcessedMetrics.techThemeClustering).sort((a, b) => b[1] - a[1]).slice(0, 6);
     const rawTechVals = sortedTech.map(x => x[1]);
     const maxTechVal = Math.max(...rawTechVals);
-    // 平方根压缩：削弱极端值主导，让各扇区面积更均衡
+    // 平方根压缩，让各扇区面积更均衡
     const displayTechVals = rawTechVals.map(v => Math.sqrt(v / maxTechVal) * maxTechVal);
     loadedChartsInstances['chartAct1TechRose'] = new Chart(document.getElementById('chartAct1TechRose').getContext('2d'), {
         type: 'polarArea',
@@ -315,7 +313,7 @@ function renderAct1() {
                     boxPadding: 4,
                     callbacks: {
                         label: function (ctx) {
-                            // tooltip 展示原始真实数值
+                            // tooltip 显示原始数值
                             const realVal = rawTechVals[ctx.dataIndex];
                             return ` ${ctx.label}：${realVal.toLocaleString()} 件专利`;
                         }
@@ -325,11 +323,11 @@ function renderAct1() {
         }
     });
 
-    // ========== 4. 创新地市排行 TOP 5 水平条形图（渐变+数据标签） ==========
+    // ========== 4. 地市排行条形图 ==========
     clearCanvas('chartAct1CityBar');
     let sortedCity = Object.entries(globalProcessedMetrics.cityRanking).sort((a, b) => b[1] - a[1]).slice(0, 5);
     const cityCtx = document.getElementById('chartAct1CityBar').getContext('2d');
-    // 按排名创建从深到浅的水平渐变色数组
+    // 按排名生成渐变色
     const cityBarColors = sortedCity.map((_, i) => {
         const grad = cityCtx.createLinearGradient(0, 0, cityCtx.canvas.width, 0);
         const alpha = 1 - i * 0.15;
@@ -338,7 +336,7 @@ function renderAct1() {
         return grad;
     });
 
-    // 只为这个图表临时注册插件，不影响其他图表
+    // 只给这个图表加 datalabels 插件
     let cityChartPlugins = [];
     if (typeof ChartDataLabels !== 'undefined') {
         cityChartPlugins.push(ChartDataLabels);
@@ -363,11 +361,11 @@ function renderAct1() {
                 categoryPercentage: 0.8
             }]
         },
-        plugins: cityChartPlugins, // 只为这个图表添加插件
+        plugins: cityChartPlugins,
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            indexAxis: 'y', // 水平条形图
+            indexAxis: 'y',
             scales: {
                 x: {
                     ticks: { color: '#64748b', font: { size: 11, weight: '500' }, padding: 6 },
@@ -409,7 +407,7 @@ function renderAct1() {
                     formatter: function (value, ctx) {
                         return value.toLocaleString();
                     },
-                    offset: 0 // 居中显示
+                    offset: 0
                 }
             }
         }

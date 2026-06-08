@@ -1,5 +1,5 @@
-// Act 4: 主体竞争网络（申请人协作网络）
-// 数据来源：data/act3_applicant_network.json（由 patent_exploded_split.csv 预处理生成）
+// Act 4 主体竞争网络 - 申请人协作网络
+// 数据来自 patent_explode.csv，由 build_act3_data.py 预处理
 
 let act4NetworkData = null;
 
@@ -8,7 +8,7 @@ function loadAct4Data(callback) {
         callback(act4NetworkData);
         return;
     }
-    fetch('data/act3_applicant_network.json')
+    fetch('data/act4_applicant_network.json')
         .then(r => r.json())
         .then(data => {
             act4NetworkData = data;
@@ -27,9 +27,34 @@ function renderAct4() {
         svg.selectAll("*").remove();
 
         const mainG = svg.append("g");
+
+        // D3 缩放与拖拽平移
         svg.call(d3.zoom().scaleExtent([0.05, 8]).on("zoom", (event) => {
             mainG.attr("transform", event.transform);
         }));
+
+        // Ctrl + 滚轮缩放，普通滚轮正常滚动页面
+        const svgNode = svg.node();
+        svg.on("wheel.zoom", null);
+        svgNode.addEventListener("wheel", function(event) {
+            if (!event.ctrlKey) return;
+            event.preventDefault();
+
+            const [scaleMin, scaleMax] = [0.05, 8];
+            const t = d3.zoomTransform(svgNode);
+            const factor = Math.pow(2, -event.deltaY * 0.002);
+            let newK = Math.max(scaleMin, Math.min(scaleMax, t.k * factor));
+            const k = newK / t.k;
+            if (Math.abs(k - 1) < 0.001) return;
+
+            const [mx, my] = d3.pointer(event, svgNode);
+            const newT = d3.zoomIdentity
+                .translate(mx - k * (mx - t.x), my - k * (my - t.y))
+                .scale(newK);
+
+            svgNode.__zoom = newT;
+            mainG.attr("transform", newT);
+        }, { passive: false });
 
         // 创建悬浮提示
         let tooltip = d3.select("#assigneeNetworkTooltip");
@@ -118,6 +143,7 @@ function renderAct4() {
             );
             let linkedCount = linkedNodes.length;
             let totalCo = linkedNodes.reduce((s, l) => s + l.value, 0);
+            let focus = (data.applicantFocus && data.applicantFocus[d.id]) || '暂无分析数据';
 
             document.getElementById("assigneeInsightContent").innerHTML = `
                 <div style='background:#f8fafc; padding:12px; border-radius:6px; border-left:4px solid #059669'>
@@ -125,6 +151,10 @@ function renderAct4() {
                     <strong>专利数量：</strong><span style='color:#d97706; font-weight:bold;'>${d.size}</span> 件<br/><br/>
                     <strong>技术竞争对手：</strong>与图中其他 <span style='color:#059669'>${linkedCount}</span> 个申请人存在技术重叠<br/>
                     <strong>共现强度总和：</strong>${totalCo}
+                </div>
+                <div style='margin-top:12px; background:#fffbeb; padding:12px; border-radius:6px; border-left:4px solid #d97706'>
+                    <strong style='color:#d97706;'>主攻方向：</strong><br/>
+                    <p style='font-size:12px; color:#78716c; margin:8px 0 0; line-height:1.6;'>${focus}</p>
                 </div>
             `;
         })

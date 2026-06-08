@@ -47,8 +47,8 @@
         <button class="tab-btn" onclick="switchNarrativeAct(5)">五、价值预警矩阵</button>
     </div>
 
-    <!-- 主内容区：动态加载各幕 HTML -->
-    <div id="mainDashboardView" class="main-content" style="display: none;">
+    <!-- 主内容区 -->
+    <div id="mainDashboardView" class="main-content">
         <div id="narrativeAct1" class="narrative-section active">
             <!-- Act 1 内容将通过 fetch 或静态包含加载，此处先保留占位，实际开发中建议用 JS 动态插入或后端模板 -->
             <!-- 为了简化单文件运行，我们在这里直接包含结构，但逻辑已拆分 -->
@@ -95,8 +95,22 @@
         </div>
 
         <div id="narrativeAct3" class="narrative-section">
-            <div class="dashboard-card" style="height: 550px; display: flex; align-items: center; justify-content: center;">
-                <p style="color: var(--text-secondary); font-size: 14px; text-align: center;">技术融合拓扑（待开发）</p>
+            <div class="split-network-container">
+                <div class="network-svg-container">
+                    <svg id="act3TechNetworkSvg" width="100%" height="100%"></svg>
+                </div>
+                <div class="insight-panel">
+                    <h3 style="margin:0; font-size:16px; color:var(--emerald-accent);">技术共现拓扑</h3>
+                    <p style="font-size:12px; color:var(--text-secondary); margin:0; line-height:1.6;">
+                        单件专利涉及多个 IPC 分类时，产生共现连边，线越粗代表联合出现越频繁。<br /><br />
+                        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#0284c7;margin-right:4px;vertical-align:middle;"></span> 蓝色：边缘交叉创新<br />
+                        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#d97706;margin-right:4px;vertical-align:middle;"></span> 橙色：核心高频研发
+                    </p>
+                    <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:5px 0;" />
+                    <div id="techInsightContent" style="font-size:13px; color:var(--text-primary);">
+                        <span style="color:var(--text-secondary);">点击网络中的任意节点查看技术详情...</span>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -106,11 +120,11 @@
                     <svg id="act4AssigneeNetworkSvg" width="100%" height="100%"></svg>
                 </div>
                 <div class="insight-panel">
-                    <h3 style="margin:0; font-size:16px; color:var(--emerald-accent);">⚔️ 申请人协作网络面板</h3>
+                    <h3 style="margin:0; font-size:16px; color:var(--emerald-accent);">申请人协作网络</h3>
                     <p style="font-size:12px; color:var(--text-secondary); margin:0; line-height:1.6;">
-                        <strong>业务图景现实逻辑：</strong>如果两个申请人在相同的 IPC 技术子分类下均有专利布局，即产生技术竞争连边。共现次数越多，说明两者在同一技术赛道的重叠度越高。<br /><br />
-                        🔵 蓝色细线：轻度技术重叠<br />
-                        🔴 红色粗线：高强度技术竞争
+                        两个申请人在相同 IPC 子分类下均有专利，即产生连边。共现越多，技术赛道重叠度越高。<br /><br />
+                        <span style="display:inline-block;width:14px;height:2px;background:rgba(5,150,105,0.5);margin-right:4px;vertical-align:middle;"></span> 细线：轻度重叠<br />
+                        <span style="display:inline-block;width:14px;height:4px;background:rgba(225,29,72,0.7);margin-right:4px;vertical-align:middle;"></span> 粗线：高强度竞争
                     </p>
                     <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:5px 0;" />
                     <div id="assigneeInsightContent" style="font-size:13px; color:var(--text-primary);">
@@ -136,12 +150,9 @@
 
     <div id="globalTooltip" class="tooltip"></div>
 
-    <!-- 引入核心逻辑与各幕逻辑 -->
-    <!-- 1. 数据管道（包含 executeCoreDataPipeline、triggerSectionLazyRender 和 renderAllSectionsOnce） -->
+    <!-- 引入脚本 -->
     <script src="js/data-pipeline.js"></script>
-    <!-- 2. 核心控制（包含文件上传和标签切换） -->
     <script src="js/core.js"></script>
-    <!-- 3. 各幕渲染逻辑（每个文件包含对应的 renderActX 函数） -->
     <script src="acts/act1/act1.js"></script>
     <script src="acts/act2/act2.js"></script>
     <script src="acts/act3/act3.js"></script>

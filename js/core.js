@@ -4,38 +4,48 @@ let globalProcessedMetrics = {};
 let loadedChartsInstances = {};
 let assigneeTechFocus = {};
 
-// 标签切换逻辑（仅负责视图切换，不再触发渲染）
+// 点击标签跳转到对应幕
 function switchNarrativeAct(actId) {
-    document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', (i + 1) === actId));
-
-    // 隐藏所有幕，显示当前幕
-    document.querySelectorAll('.narrative-section').forEach((s, i) => {
-        s.classList.remove('active');
-        if ((i + 1) === actId) {
-            s.classList.add('active');
-
-            // 平滑滚动到该幕内容区域的顶部
-            setTimeout(() => {
-                const targetSection = document.getElementById(`narrativeAct${actId}`);
-                if (targetSection) {
-                    targetSection.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            }, 100);
-        }
-    });
+    const target = document.getElementById(`narrativeAct${actId}`);
+    if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 }
 
-// 页面加载时自动读取 patent.csv 并执行数据管道
+// 滚动监听：根据当前可见位置高亮标签
+function initScrollSpy() {
+    const sections = document.querySelectorAll('.narrative-section');
+    const tabs = document.querySelectorAll('.tab-btn');
+    if (!sections.length || !tabs.length) return;
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const id = entry.target.id;
+                const match = id.match(/narrativeAct(\d)/);
+                if (match) {
+                    const actNum = parseInt(match[1]);
+                    tabs.forEach((t, i) => t.classList.toggle('active', (i + 1) === actNum));
+                }
+            }
+        });
+    }, {
+        // 顶部导航栏占约120px，所以rootMargin往上缩
+        rootMargin: '-120px 0px -60% 0px',
+        threshold: 0
+    });
+
+    sections.forEach(s => observer.observe(s));
+}
+
+// 页面加载后读取 patent.csv
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('globalLoadingNotice').style.display = 'block';
 
     fetch('patent.csv')
         .then(response => response.arrayBuffer())
         .then(buffer => {
-            // 先尝试 UTF-8 解码（fatal 模式会在遇到无效字节时抛异常），失败则回退 GBK
+            // 先试 UTF-8，失败则 GBK
             let csvText;
             try {
                 csvText = new TextDecoder('utf-8', { fatal: true }).decode(buffer);
@@ -43,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 csvText = new TextDecoder('gbk').decode(buffer);
             }
 
-            // 用已正确解码的文本交给 PapaParse 解析
+            // 交给 PapaParse 解析
             const parsed = Papa.parse(csvText, {
                 header: true,
                 skipEmptyLines: true
