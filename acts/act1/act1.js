@@ -266,29 +266,26 @@ function renderAct1() {
         }
     });
 
-    // ========== 3. 技术分支主题分布雷达图（对数平滑） ==========
+    // ========== 3. 技术主题分布极区图（Top 6） ==========
     clearCanvas('chartAct1TechRose');
     let sortedTech = Object.entries(globalProcessedMetrics.techThemeClustering).sort((a, b) => b[1] - a[1]).slice(0, 6);
-    const rawTechValues = sortedTech.map(x => x[1]);
-    // 使用对数转换平滑极差，+1 防止 log(0)
-    const logTechValues = rawTechValues.map(v => Math.log(v + 1));
+    const rawTechVals = sortedTech.map(x => x[1]);
+    const maxTechVal = Math.max(...rawTechVals);
+    // 平方根压缩：削弱极端值主导，让各扇区面积更均衡
+    const displayTechVals = rawTechVals.map(v => Math.sqrt(v / maxTechVal) * maxTechVal);
     loadedChartsInstances['chartAct1TechRose'] = new Chart(document.getElementById('chartAct1TechRose').getContext('2d'), {
-        type: 'radar',
+        type: 'polarArea',
         data: {
-            labels: sortedTech.map(x => x[0].substring(0, 8)),
+            labels: sortedTech.map(x => x[0].split('（')[0]),
             datasets: [{
-                label: '专利数量（对数平滑）',
-                data: logTechValues,
-                backgroundColor: 'rgba(2,132,199,0.2)',
-                borderColor: '#0284c7',
-                borderWidth: 2,
-                pointBackgroundColor: '#0284c7',
-                pointBorderColor: '#ffffff',
-                pointBorderWidth: 2,
-                pointRadius: 8,
-                pointHoverRadius: 11,
-                pointHoverBackgroundColor: '#0369a1',
-                fill: true
+                data: displayTechVals,
+                backgroundColor: [
+                    'rgba(200,151,60,0.55)', 'rgba(74,138,106,0.55)',
+                    'rgba(58,90,138,0.55)',  'rgba(192,64,48,0.55)',
+                    'rgba(138,125,101,0.55)','rgba(180,148,80,0.35)'
+                ],
+                borderColor: '#2a2520',
+                borderWidth: 1
             }]
         },
         options: {
@@ -296,18 +293,15 @@ function renderAct1() {
             maintainAspectRatio: false,
             scales: {
                 r: {
-                    ticks: { display: false, stepSize: 1 },
-                    grid: { color: 'rgba(0,0,0,0.06)' },
-                    angleLines: { color: 'rgba(0,0,0,0.06)' },
-                    pointLabels: {
-                        color: '#334155',
-                        font: { size: 11, weight: '600' },
-                        padding: 8
-                    }
+                    ticks: { display: false },
+                    grid: { color: 'rgba(180,148,80,0.07)' }
                 }
             },
             plugins: {
-                legend: { display: false },
+                legend: {
+                    position: 'right',
+                    labels: { color: '#8a7d65', font: { size: 10 } }
+                },
                 tooltip: {
                     backgroundColor: 'rgba(255,255,255,0.95)',
                     titleColor: '#0f172a',
@@ -321,20 +315,11 @@ function renderAct1() {
                     boxPadding: 4,
                     callbacks: {
                         label: function (ctx) {
-                            const realVal = rawTechValues[ctx.dataIndex];
+                            // tooltip 展示原始真实数值
+                            const realVal = rawTechVals[ctx.dataIndex];
                             return ` ${ctx.label}：${realVal.toLocaleString()} 件专利`;
                         }
                     }
-                },
-                datalabels: {
-                    color: '#0284c7',
-                    font: { size: 10, weight: 'bold' },
-                    anchor: 'end',
-                    align: 'top',
-                    formatter: function (value, ctx) {
-                        return rawTechValues[ctx.dataIndex].toLocaleString();
-                    },
-                    offset: 6
                 }
             }
         }

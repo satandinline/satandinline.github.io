@@ -77,7 +77,7 @@
                     </div>
                 </div>
                 <div class="dashboard-card" style="grid-column: 3; grid-row: 1;">
-                    <h3>技术分支主题分布 (Top 6)</h3>
+                    <h3>技术主题分布（Top 6）</h3>
                     <div class="canvas-wrapper"><canvas id="chartAct1TechRose"></canvas></div>
                 </div>
                 <div class="dashboard-card" style="grid-column: 3; grid-row: 2;">
@@ -95,22 +95,8 @@
         </div>
 
         <div id="narrativeAct3" class="narrative-section">
-            <div class="split-network-container">
-                <div class="network-svg-container">
-                    <svg id="act3TechNetworkSvg" width="100%" height="100%"></svg>
-                </div>
-                <div class="insight-panel">
-                    <h3 style="margin:0; font-size:16px; color:var(--cyan-accent);">💡 技术共现拓扑面板</h3>
-                    <p style="font-size:12px; color:var(--text-secondary); margin:0; line-height:1.6;">
-                        <strong>业务图景现实逻辑：</strong>同一件专利如果包含多项交叉IPC分类号，即自动产生科学共现联结。线越粗意味着这些领域经常进行**联合研发跨界突破**。<br /><br />
-                        🔵 蓝色线：边缘交叉创新探索<br />
-                        🔴 红色粗线：核心高频绑定研发带
-                    </p>
-                    <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:5px 0;" />
-                    <div id="techInsightContent" style="font-size:13px; color:var(--text-primary);">
-                        <span style="color:var(--text-secondary);">点击网络中的任意技术球查看数据洞察...</span>
-                    </div>
-                </div>
+            <div class="dashboard-card" style="height: 550px; display: flex; align-items: center; justify-content: center;">
+                <p style="color: var(--text-secondary); font-size: 14px; text-align: center;">技术融合拓扑（待开发）</p>
             </div>
         </div>
 
@@ -120,15 +106,15 @@
                     <svg id="act4AssigneeNetworkSvg" width="100%" height="100%"></svg>
                 </div>
                 <div class="insight-panel">
-                    <h3 style="margin:0; font-size:16px; color:var(--emerald-accent);">⚔️ 竞争主体格局面板</h3>
+                    <h3 style="margin:0; font-size:16px; color:var(--emerald-accent);">⚔️ 申请人协作网络面板</h3>
                     <p style="font-size:12px; color:var(--text-secondary); margin:0; line-height:1.6;">
-                        <strong>业务图景现实逻辑：</strong>如果两个企业或高校在同一细分机器人核心技术分支中密集申请专利，意味着强烈的**正面市场对决与研发对抗**。节点越大实力越雄厚。<br /><br />
-                        🟢 绿色细线：技术板块存在重叠<br />
-                        🔥 橙色粗线：白热化主战场对攻！
+                        <strong>业务图景现实逻辑：</strong>如果两个申请人在相同的 IPC 技术子分类下均有专利布局，即产生技术竞争连边。共现次数越多，说明两者在同一技术赛道的重叠度越高。<br /><br />
+                        🔵 蓝色细线：轻度技术重叠<br />
+                        🔴 红色粗线：高强度技术竞争
                     </p>
                     <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:5px 0;" />
                     <div id="assigneeInsightContent" style="font-size:13px; color:var(--text-primary);">
-                        <span style="color:var(--text-secondary);">点击网络中的主体节点查看竞争宿敌分析...</span>
+                        <span style="color:var(--text-secondary);">点击网络中的任意节点查看申请人详情...</span>
                     </div>
                 </div>
             </div>
