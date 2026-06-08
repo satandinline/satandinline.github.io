@@ -1,125 +1,122 @@
-// Act 6: 专利生命周期桑基图（申请年份 → 专利类型 → 法律状态）
+// Act 6: 技术演进桑基图（年份区间 → 研究主题 → IPC 赛道）
 // 使用 D3.js 自定义布局绘制
 
 function renderAct6() {
     var m = globalProcessedMetrics;
-    if (!m.sankeyYearType || !m.sankeyTypeStatus) return;
+    if (!m.sankeyPeriodTopic || !m.sankeyTopicIpc) return;
 
-    // ── 1. 构建节点和链路 ────────────────────────────
-    var yearSet = new Set();
-    var typeSet = new Set();
-    var statusSet = new Set();
+    // ── 1. 汇总各层节点总量，筛选 Top N ──────────────────
+    var periodOrder = ['2000-2010', '2011-2015', '2016-2019', '2020-2024'];
+    var periodSet = new Set(periodOrder);
 
-    var rawYT = {};
-    Object.entries(m.sankeyYearType).forEach(function(e) {
+    var topicTotals = {};
+    Object.entries(m.sankeyPeriodTopic).forEach(function(e) {
         var parts = e[0].split('|');
-        var yr = parseInt(parts[0]);
-        var tp = parts[1];
-        if (yr < 2000) return; // 过滤掉太早的年份
-        yearSet.add(yr);
-        typeSet.add(tp);
-        rawYT[yr + '|' + tp] = e[1];
+        if (!periodSet.has(parts[0])) return;
+        topicTotals[parts[1]] = (topicTotals[parts[1]] || 0) + e[1];
     });
 
-    var rawTS = {};
-    Object.entries(m.sankeyTypeStatus).forEach(function(e) {
+    var ipcTotals = {};
+    Object.entries(m.sankeyTopicIpc).forEach(function(e) {
         var parts = e[0].split('|');
-        var tp = parts[0];
-        var st = parts[1];
-        if (!typeSet.has(tp)) return;
-        statusSet.add(st);
-        rawTS[tp + '|' + st] = e[1];
+        ipcTotals[parts[1]] = (ipcTotals[parts[1]] || 0) + e[1];
     });
 
-    // 过滤专利数太少的年份（<10件）
-    var yearTotals = {};
-    Object.entries(rawYT).forEach(function(e) {
-        var yr = parseInt(e[0].split('|')[0]);
-        yearTotals[yr] = (yearTotals[yr] || 0) + e[1];
-    });
-    Object.keys(yearTotals).forEach(function(yr) {
-        if (yearTotals[yr] < 10) yearSet.delete(parseInt(yr));
-    });
-
-    // 重新清理 typeSet：只保留与过滤后年份有关联的类型
-    typeSet = new Set();
-    Object.entries(rawYT).forEach(function(e) {
-        var yr = parseInt(e[0].split('|')[0]);
-        if (yearSet.has(yr)) typeSet.add(e[0].split('|')[1]);
+    // 只保留有流量的年份区间
+    var usedPeriods = [];
+    periodOrder.forEach(function(p) {
+        var hasData = Object.keys(m.sankeyPeriodTopic).some(function(k) {
+            return k.startsWith(p + '|');
+        });
+        if (hasData) usedPeriods.push(p);
     });
 
-    // 重新清理 statusSet
-    statusSet = new Set();
-    Object.entries(rawTS).forEach(function(e) {
-        if (typeSet.has(e[0].split('|')[0])) statusSet.add(e[0].split('|')[1]);
-    });
+    var topTopics = Object.entries(topicTotals).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 14).map(function(e) { return e[0]; });
+    var topIpcs = Object.entries(ipcTotals).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 10).map(function(e) { return e[0]; });
 
-    var years = Array.from(yearSet).sort(function(a, b) { return a - b; });
-    var types = Array.from(typeSet).sort();
-    var statuses = Array.from(statusSet).sort();
+    var topicSet = new Set(topTopics);
+    var ipcSet = new Set(topIpcs);
 
-    if (years.length === 0 || types.length === 0 || statuses.length === 0) return;
+    if (usedPeriods.length === 0 || topicSet.size === 0 || ipcSet.size === 0) return;
 
-    // 创建节点
+    // ── 2. 构建节点和链路 ────────────────────────────
     var nodes = [];
     var nodeMap = {};
-    years.forEach(function(y) {
-        var n = { id: 'Y' + y, name: String(y), layer: 0, value: 0 };
+
+    usedPeriods.forEach(function(p) {
+        var n = { id: 'P_' + p, name: p, layer: 0, value: 0 };
         nodes.push(n);
         nodeMap[n.id] = n;
     });
-    types.forEach(function(t) {
-        var n = { id: 'T' + t, name: t, layer: 1, value: 0 };
+    topTopics.forEach(function(t) {
+        var n = { id: 'T_' + t, name: t, layer: 1, value: 0 };
         nodes.push(n);
         nodeMap[n.id] = n;
     });
-    statuses.forEach(function(s) {
-        var n = { id: 'S' + s, name: s, layer: 2, value: 0 };
+    topIpcs.forEach(function(c) {
+        var n = { id: 'I_' + c, name: c, layer: 2, value: 0 };
         nodes.push(n);
         nodeMap[n.id] = n;
     });
 
-    // 创建链路（过滤低流量链路）
     var links = [];
-    var MIN_LINK = 5;
-    Object.entries(rawYT).forEach(function(e) {
+    var MIN_LINK = 3;
+
+    // Layer 0→1: 年份区间 → 研究主题
+    Object.entries(m.sankeyPeriodTopic).forEach(function(e) {
         var parts = e[0].split('|');
-        var yr = parseInt(parts[0]);
-        var tp = parts[1];
-        if (!yearSet.has(yr) || !typeSet.has(tp) || e[1] < MIN_LINK) return;
-        links.push({ source: 'Y' + yr, target: 'T' + tp, value: e[1] });
-    });
-    Object.entries(rawTS).forEach(function(e) {
-        var parts = e[0].split('|');
-        var tp = parts[0];
-        var st = parts[1];
-        if (!typeSet.has(tp) || !statusSet.has(st) || e[1] < MIN_LINK) return;
-        links.push({ source: 'T' + tp, target: 'S' + st, value: e[1] });
+        var period = parts[0], topic = parts[1];
+        if (!periodSet.has(period) || !topicSet.has(topic) || e[1] < MIN_LINK) return;
+        links.push({ source: 'P_' + period, target: 'T_' + topic, value: e[1] });
     });
 
-    // 计算节点流量总值
+    // Layer 1→2: 研究主题 → IPC赛道
+    Object.entries(m.sankeyTopicIpc).forEach(function(e) {
+        var parts = e[0].split('|');
+        var topic = parts[0], ipc = parts[1];
+        if (!topicSet.has(topic) || !ipcSet.has(ipc) || e[1] < MIN_LINK) return;
+        links.push({ source: 'T_' + topic, target: 'I_' + ipc, value: e[1] });
+    });
+
+    // 计算节点总值
     links.forEach(function(lk) {
         if (nodeMap[lk.source]) nodeMap[lk.source].value += lk.value;
         if (nodeMap[lk.target]) nodeMap[lk.target].value += lk.value;
     });
 
-    // ── 2. 桑基图布局计算 ────────────────────────────
-    var container = document.getElementById('act6SankeyContainer');
-    var W = container.clientWidth || 900;
-    var H = container.clientHeight || 620;
-    var margin = { top: 45, bottom: 20, left: 70, right: 70 };
-    var nodeW = 16;
-    var nodePad = 5;
+    // 移除孤立节点
+    var connectedIds = new Set();
+    links.forEach(function(lk) { connectedIds.add(lk.source); connectedIds.add(lk.target); });
+    nodes = nodes.filter(function(n) { return connectedIds.has(n.id); });
 
+    // 分层
     var layers = [
         nodes.filter(function(n) { return n.layer === 0; }),
         nodes.filter(function(n) { return n.layer === 1; }),
         nodes.filter(function(n) { return n.layer === 2; })
     ];
 
-    var xPositions = [margin.left, (W - margin.left - margin.right) / 2 + margin.left - nodeW / 2, W - margin.right - nodeW];
+    if (layers[0].length === 0 || layers[1].length === 0 || layers[2].length === 0) return;
+
+    // ── 3. 桑基图布局计算 ────────────────────────────
+    var container = document.getElementById('act6SankeyContainer');
+    var W = container.clientWidth || 900;
+    var H = container.clientHeight || 620;
+    var margin = { top: 45, bottom: 20, left: 80, right: 80 };
+    var nodeW = 16;
+    var nodePad = 5;
+
+    var xPositions = [
+        margin.left,
+        (W - margin.left - margin.right) / 2 + margin.left - nodeW / 2,
+        W - margin.right - nodeW
+    ];
 
     layers.forEach(function(layer, li) {
+        // layer 0 按年份升序，layer 1/2 按 value 降序
+        if (li === 0) layer.sort(function(a, b) { return a.name.localeCompare(b.name); });
+        else layer.sort(function(a, b) { return b.value - a.value; });
+
         var totalVal = layer.reduce(function(s, n) { return s + n.value; }, 0);
         var availH = H - margin.top - margin.bottom - (layer.length - 1) * nodePad;
         if (availH < 1) availH = 1;
@@ -134,23 +131,18 @@ function renderAct6() {
         });
     });
 
-    // 节点排序：layer 0 按名称（年份）升序，layer 1/2 按 value 降序
-    // 排序已在 layers 定义时通过 sort 完成
-
     // 计算链路 y 位置
     var srcOff = {};
     var tgtOff = {};
     nodes.forEach(function(n) { srcOff[n.id] = 0; tgtOff[n.id] = 0; });
 
-    // layer 0→1 链路
-    var links01 = links.filter(function(l) { return nodeMap[l.source].layer === 0; })
+    var links01 = links.filter(function(l) { return nodeMap[l.source] && nodeMap[l.source].layer === 0; })
         .sort(function(a, b) {
             var sa = nodeMap[a.source], sb = nodeMap[b.source];
             var ta = nodeMap[a.target], tb = nodeMap[b.target];
             return (sa.y0 - sb.y0) || (ta.y0 - tb.y0);
         });
-    // layer 1→2 链路
-    var links12 = links.filter(function(l) { return nodeMap[l.source].layer === 1; })
+    var links12 = links.filter(function(l) { return nodeMap[l.source] && nodeMap[l.source].layer === 1; })
         .sort(function(a, b) {
             var sa = nodeMap[a.source], sb = nodeMap[b.source];
             var ta = nodeMap[a.target], tb = nodeMap[b.target];
@@ -175,22 +167,33 @@ function renderAct6() {
         tgtOff[link.target] += tw;
     });
 
-    // ── 3. D3 渲染 ────────────────────────────────────
+    // ── 4. D3 渲染 ────────────────────────────────────
     var svg = d3.select('#act6SankeySvg');
     svg.selectAll('*').remove();
     var tooltip = d3.select('#globalTooltip');
 
-    // 颜色方案
-    var statusColors = { '授权': '#059669', '审查': '#0284c7', '驳回/撤回': '#e11d48', '失效/放弃': '#94a3b8' };
-    var typeColors = ['#0284c7', '#059669', '#d97706', '#e11d48', '#7c3aed', '#0891b2', '#65a30d'];
-    var yearColorScale = d3.scaleLinear()
-        .domain([years[0], years[years.length - 1]])
-        .range(['#93c5fd', '#1e40af']);
+    // 年份区间颜色：从浅到深的蓝绿梯度
+    var periodColors = {
+        '2000-2010': '#94a3b8',
+        '2011-2015': '#0891b2',
+        '2016-2019': '#0284c7',
+        '2020-2024': '#1e40af'
+    };
+
+    var topicColor = '#64748b';
+    var ipcColors = d3.scaleOrdinal()
+        .domain(topIpcs)
+        .range(['#059669', '#0284c7', '#d97706', '#e11d48', '#7c3aed', '#0891b2', '#65a30d', '#db2777', '#4f46e5', '#ea580c']);
 
     function nodeColor(node) {
-        if (node.layer === 0) return yearColorScale(parseInt(node.name));
-        if (node.layer === 1) return typeColors[types.indexOf(node.name) % typeColors.length];
-        return statusColors[node.name] || '#94a3b8';
+        if (node.layer === 0) return periodColors[node.name] || '#94a3b8';
+        if (node.layer === 1) return topicColor;
+        return ipcColors(node.name);
+    }
+
+    function linkColor(link) {
+        if (link.targetNode.layer === 1) return periodColors[link.sourceNode.name] || topicColor;
+        return ipcColors(link.targetNode.name);
     }
 
     function linkPath(d) {
@@ -210,7 +213,7 @@ function renderAct6() {
         .join('path')
         .attr('class', 'sankey-link')
         .attr('d', linkPath)
-        .attr('fill', function(d) { return nodeColor(nodeMap[d.target]); })
+        .attr('fill', function(d) { return linkColor(d); })
         .on('mouseover', function(event, d) {
             d3.select(this).attr('fill-opacity', 0.5);
             tooltip.style('opacity', 1)
@@ -240,7 +243,7 @@ function renderAct6() {
         .attr('rx', 2)
         .on('mouseover', function(event, d) {
             tooltip.style('opacity', 1)
-                .html('<strong>' + d.name + '</strong><br/>总量：' + d.value + ' 件');
+                .html('<strong>' + d.name + '</strong><br/>流量：' + d.value + ' 件');
         })
         .on('mousemove', function(event) {
             tooltip.style('left', (event.pageX + 14) + 'px').style('top', (event.pageY - 18) + 'px');
@@ -253,18 +256,9 @@ function renderAct6() {
     nodeGroups.each(function(d) {
         var g = d3.select(this);
         var isLeft = d.layer === 0;
-        var isRight = d.layer === 2;
         var tx, anchor;
-        if (isLeft) {
-            tx = d.x0 - 6;
-            anchor = 'end';
-        } else if (isRight) {
-            tx = d.x1 + 6;
-            anchor = 'start';
-        } else {
-            tx = d.x1 + 6;
-            anchor = 'start';
-        }
+        if (isLeft) { tx = d.x0 - 6; anchor = 'end'; }
+        else { tx = d.x1 + 6; anchor = 'start'; }
         var ty = (d.y0 + d.y1) / 2;
         var minH = d.y1 - d.y0;
 
@@ -288,7 +282,7 @@ function renderAct6() {
     });
 
     // 图层标题
-    var layerTitles = ['申请年份', '专利类型', '法律状态'];
+    var layerTitles = ['申请年份', '研究主题', 'IPC 赛道'];
     var titleX = [margin.left, (W - margin.left - margin.right) / 2 + margin.left, W - margin.right];
     layerTitles.forEach(function(title, i) {
         svg.append('text')

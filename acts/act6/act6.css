@@ -1,16 +1,4 @@
-/* Act 6: 专利生命周期桑基图 */
-
-.act6-intro {
-    background: #f1f5f9;
-    border-left: 3px solid var(--emerald-accent);
-    padding: 14px 18px;
-    margin-bottom: 20px;
-    font-size: 13px;
-    color: var(--text-secondary);
-    line-height: 1.8;
-    letter-spacing: 0.5px;
-}
-.act6-intro strong { color: var(--emerald-accent); }
+/* Act 6: 技术脉络桑基图 */
 
 .act6-card {
     background: #ffffff !important;

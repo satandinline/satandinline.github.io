@@ -163,3 +163,42 @@ body {
     z-index: 9999;
     display: none;
 }
+
+/* ── SCENE 叙事框架 ── */
+.scene-header {
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-glow);
+}
+.scene-num {
+    display: inline-block;
+    font-size: 10px;
+    color: var(--cyan-accent);
+    letter-spacing: 3px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+.scene-title {
+    margin: 2px 0 4px 0;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 1px;
+}
+.scene-subtitle {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+}
+.act-intro {
+    background: #f1f5f9;
+    border-left: 3px solid var(--cyan-accent);
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    letter-spacing: 0.5px;
+}
+.act-intro strong { color: var(--cyan-accent); }

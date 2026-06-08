@@ -10,9 +10,9 @@ function executeCoreDataPipeline() {
             techCoOccurrenceMatrix: {}, assigneeCoMatrix: {},
             valueScoreDistribution: { high: 0, mid: 0, low: 0 },
             riskDistribution: { expired: 0, critical: 0, normal: 0 },
-            // 桑基图流转数据：申请年份 → 专利类型 → 法律状态
-            sankeyYearType: {},   // { "2015|发明": 42, ... }
-            sankeyTypeStatus: {}  // { "发明|授权": 30, ... }
+            // 桑基图流转数据：年份区间 → 研究主题 → IPC赛道
+            sankeyPeriodTopic: {},    // { "2016-2019|视觉": 42, ... }
+            sankeyTopicIpc: {}        // { "视觉|G06T": 30, ... }
         };
         assigneeTechFocus = {};
 
@@ -137,14 +137,33 @@ function executeCoreDataPipeline() {
                 else globalProcessedMetrics.riskDistribution.normal++;
             }
 
-            // 9. 桑基图流转统计（申请年份 → 专利类型 → 法律状态）
-            let sankeyYear = appDateStr ? parseInt(appDateStr.substring(0, 4)) : 0;
-            let sankeyType = (row['专利类型'] || '未知').trim() || '未知';
-            if (sankeyYear > 1980 && sankeyYear <= 2026 && sankeyType !== '-') {
-                let ytKey = sankeyYear + '|' + sankeyType;
-                globalProcessedMetrics.sankeyYearType[ytKey] = (globalProcessedMetrics.sankeyYearType[ytKey] || 0) + 1;
-                let tsKey = sankeyType + '|' + cleanStatus;
-                globalProcessedMetrics.sankeyTypeStatus[tsKey] = (globalProcessedMetrics.sankeyTypeStatus[tsKey] || 0) + 1;
+            // 9. 桑基图流转统计（年份区间 → 研究主题 → IPC赛道）
+            // 从标题提取研究主题关键词
+            const SK_KW = ['机械手','机器人','控制','视觉','传感','移动','自动','检测','驱动','路径规划','夹持','焊接','导航','仿生','协同','力反馈','图像','抓取','行走','柔性','学习','智能','定位','识别'];
+            let rawTitle = title || '';
+            let foundKw = [];
+            for (let ki = 0; ki < SK_KW.length; ki++) {
+                if (rawTitle.includes(SK_KW[ki])) foundKw.push(SK_KW[ki]);
+            }
+            if (foundKw.length === 0) foundKw = ['其他'];
+            // 年份区间分组
+            let sYear = appDateStr ? parseInt(appDateStr.substring(0, 4)) : 0;
+            let period = '';
+            if (sYear >= 2000 && sYear <= 2010) period = '2000-2010';
+            else if (sYear >= 2011 && sYear <= 2015) period = '2011-2015';
+            else if (sYear >= 2016 && sYear <= 2019) period = '2016-2019';
+            else if (sYear >= 2020 && sYear <= 2026) period = '2020-2024';
+            // IPC 小类作为赛道维度
+            let ipcCat = row['IPC主分类号(小类)'] || '';
+            if (ipcCat && ipcCat !== '-') ipcCat = ipcCat.trim();
+            else ipcCat = ipcs[0] ? ipcs[0].substring(0, 4) : '';
+            if (period && ipcCat) {
+                foundKw.forEach(kw => {
+                    let ptKey = period + '|' + kw;
+                    globalProcessedMetrics.sankeyPeriodTopic[ptKey] = (globalProcessedMetrics.sankeyPeriodTopic[ptKey] || 0) + 1;
+                    let tiKey = kw + '|' + ipcCat;
+                    globalProcessedMetrics.sankeyTopicIpc[tiKey] = (globalProcessedMetrics.sankeyTopicIpc[tiKey] || 0) + 1;
+                });
             }
         });
 
