@@ -1,7 +1,6 @@
 // 全局变量定义
 let rawGlobalPatentDataset = [];
 let globalProcessedMetrics = {};
-let loadedChartsInstances = {};
 let assigneeTechFocus = {};
 
 // 点击标签跳转到对应幕

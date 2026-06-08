@@ -7,9 +7,7 @@
     <title>机器人专利创新全景智能化分析大屏</title>
 
     <!-- 引入第三方库 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
     <script src="https://cdn.kesci.com/lib/pyecharts_assets/maps/china.js"></script>
@@ -70,7 +68,7 @@
                             </div>
                             <div class="prologue-block">
                                 <h3>我们怎么做？</h3>
-                                <p>整个项目基于 D3.js、ECharts、Chart.js 等前端可视化库搭建，参考了国内外专利可视化研究的成熟方法：用热力地图看地域分布，用网络图看技术融合和竞争关系，用桑基图看技术演进。每个图表都支持交互操作，可以悬停查看详情、点击深入探索。</p>
+                                <p>整个项目基于 D3.js、ECharts 等前端可视化库搭建，参考了国内外专利可视化研究的成熟方法：用热力地图看地域分布，用网络图看技术融合和竞争关系，用桑基图看技术演进。每个图表都支持交互操作，可以悬停查看详情、点击深入探索。</p>
                             </div>
                             <div class="prologue-block">
                                 <h3>做了有什么意义？</h3>
@@ -179,7 +177,7 @@
             <!-- 数据处理说明 -->
             <div class="ds-processing-note">
                 <h3>数据处理说明</h3>
-                <p>所有数据均来源于智慧牙专利数据库的检索导出，筛选条件为“人型机器人”相关发明与实用新型专利。原始数据经过去重、字段标准化、省份映射等清洗步骤后得到 patent.csv。派生表格均由 patent.csv 通过 Python 脚本加工生成，其中 IPC 分类号拆解采用一对多展开，省份统计剔除了“未知”及境外记录。前端可视化采用 D3.js、ECharts、Chart.js 等库实现交互呈现。</p>
+                <p>所有数据均来源于智慧牙专利数据库的检索导出，筛选条件为“人型机器人”相关发明与实用新型专利。原始数据经过去重、字段标准化、省份映射等清洗步骤后得到 patent.csv。派生表格均由 patent.csv 通过 Python 脚本加工生成，其中 IPC 分类号拆解采用一对多展开，省份统计剔除了“未知”及境外记录。前端可视化采用 D3.js、ECharts 等库实现交互呈现。</p>
             </div>
         </div>
 
@@ -208,7 +206,7 @@
                 </div>
                 <div class="dashboard-card" style="grid-column: 1; grid-row: 1;">
                     <h3>专利法律审查结构</h3>
-                    <div class="canvas-wrapper"><canvas id="chartAct1GrantRate"></canvas></div>
+                    <div class="canvas-wrapper" id="chartAct1GrantRate"></div>
                 </div>
                 <div class="dashboard-card" style="grid-column: 1; grid-row: 2;">
                     <h3>高价值专利资产池</h3>
@@ -219,16 +217,16 @@
                             <div id="metricHighValueRatio" style="font-size:12px; color:var(--text-secondary);">占比 --%
                             </div>
                         </div>
-                        <div style="width: 120px; height: 120px;"><canvas id="chartAct1HighValueArc"></canvas></div>
+                        <div id="chartAct1HighValueArc" style="width:120px;height:120px;"></div>
                     </div>
                 </div>
                 <div class="dashboard-card" style="grid-column: 3; grid-row: 1;">
                     <h3>技术主题分布（Top 6）</h3>
-                    <div class="canvas-wrapper"><canvas id="chartAct1TechRose"></canvas></div>
+                    <div class="canvas-wrapper" id="chartAct1TechRose"></div>
                 </div>
                 <div class="dashboard-card" style="grid-column: 3; grid-row: 2;">
                     <h3 style="color: var(--cyan-accent);">创新地市排行 TOP 5</h3>
-                    <div class="canvas-wrapper"><canvas id="chartAct1CityBar"></canvas></div>
+                    <div class="canvas-wrapper" id="chartAct1CityBar"></div>
                 </div>
             </div>
         </div>
