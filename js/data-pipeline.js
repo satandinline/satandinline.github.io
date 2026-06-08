@@ -9,7 +9,10 @@ function executeCoreDataPipeline() {
             techThemeClustering: {}, assigneeRanking: {},
             techCoOccurrenceMatrix: {}, assigneeCoMatrix: {},
             valueScoreDistribution: { high: 0, mid: 0, low: 0 },
-            riskDistribution: { expired: 0, critical: 0, normal: 0 }
+            riskDistribution: { expired: 0, critical: 0, normal: 0 },
+            // 桑基图流转数据：申请年份 → 专利类型 → 法律状态
+            sankeyYearType: {},   // { "2015|发明": 42, ... }
+            sankeyTypeStatus: {}  // { "发明|授权": 30, ... }
         };
         assigneeTechFocus = {};
 
@@ -133,6 +136,16 @@ function executeCoreDataPipeline() {
                 if (cleanStatus === '失效/放弃' || cleanStatus === '驳回/撤回') globalProcessedMetrics.riskDistribution.expired++;
                 else globalProcessedMetrics.riskDistribution.normal++;
             }
+
+            // 9. 桑基图流转统计（申请年份 → 专利类型 → 法律状态）
+            let sankeyYear = appDateStr ? parseInt(appDateStr.substring(0, 4)) : 0;
+            let sankeyType = (row['专利类型'] || '未知').trim() || '未知';
+            if (sankeyYear > 1980 && sankeyYear <= 2026 && sankeyType !== '-') {
+                let ytKey = sankeyYear + '|' + sankeyType;
+                globalProcessedMetrics.sankeyYearType[ytKey] = (globalProcessedMetrics.sankeyYearType[ytKey] || 0) + 1;
+                let tsKey = sankeyType + '|' + cleanStatus;
+                globalProcessedMetrics.sankeyTypeStatus[tsKey] = (globalProcessedMetrics.sankeyTypeStatus[tsKey] || 0) + 1;
+            }
         });
 
         // 计算头部企业之间的竞争连线
@@ -159,6 +172,7 @@ function executeCoreDataPipeline() {
         if (typeof renderAct3 === 'function') renderAct3();
         if (typeof renderAct4 === 'function') renderAct4();
         if (typeof renderAct5 === 'function') renderAct5();
+        if (typeof renderAct6 === 'function') renderAct6();
 
         // 初始化滚动监听，高亮当前幕的标签
         initScrollSpy();

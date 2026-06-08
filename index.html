@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="acts/act3/act3.css">
     <link rel="stylesheet" href="acts/act4/act4.css">
     <link rel="stylesheet" href="acts/act5/act5.css">
+    <link rel="stylesheet" href="acts/act6/act6.css">
 </head>
 
 <body>
@@ -45,6 +46,7 @@
         <button class="tab-btn" onclick="switchNarrativeAct(3)">三、技术融合拓扑</button>
         <button class="tab-btn" onclick="switchNarrativeAct(4)">四、主体竞争网络</button>
         <button class="tab-btn" onclick="switchNarrativeAct(5)">五、价值预警矩阵</button>
+        <button class="tab-btn" onclick="switchNarrativeAct(6)">六、生命周期流转</button>
     </div>
 
     <!-- 主内容区 -->
@@ -135,14 +137,113 @@
         </div>
 
         <div id="narrativeAct5" class="narrative-section">
-            <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 25px;">
-                <div class="dashboard-card" style="height: 450px;">
-                    <h3>高价值专利多指标核心挖掘矩阵</h3>
-                    <div class="canvas-wrapper"><canvas id="chartAct5ValueFeature"></canvas></div>
+            <div class="act5-intro">
+                价值评分由四项指标加权合成，满分 <strong>100 分</strong>：授权状态（35分）· 被引次数（30分）· 同族数量（20分）· 技术活跃度（15分）。根据得分区间划分为 S / A / B / C / D 五级，对应不同的资产运营策略。
+            </div>
+
+            <div class="act5-layout">
+                <!-- 评分指标说明行 -->
+                <div class="act5-scoring-row">
+                    <div class="score-indicator tier-s">
+                        <span class="si-label">授权状态</span>
+                        <span class="si-name">法律确权质量</span>
+                        <span class="si-range">授权 +35 · 审查中 +15 · 失效 0</span>
+                        <div class="si-bar" style="background:var(--tc); width:100%;"></div>
+                    </div>
+                    <div class="score-indicator tier-a">
+                        <span class="si-label">被引次数</span>
+                        <span class="si-name">学术与产业引用</span>
+                        <span class="si-range">每次引用 +3分，上限 30 分</span>
+                        <div class="si-bar" style="background:var(--tc); width:85%;"></div>
+                    </div>
+                    <div class="score-indicator tier-b">
+                        <span class="si-label">同族数量</span>
+                        <span class="si-name">国际布局广度</span>
+                        <span class="si-range">每件同族 +4分，上限 20 分</span>
+                        <div class="si-bar" style="background:var(--tc); width:57%;"></div>
+                    </div>
+                    <div class="score-indicator tier-c">
+                        <span class="si-label">技术活跃度</span>
+                        <span class="si-name">IPC 分类热度</span>
+                        <span class="si-range">高热赛道 +15 · 中热 +8 · 冷门 +2</span>
+                        <div class="si-bar" style="background:var(--tc); width:43%;"></div>
+                    </div>
                 </div>
-                <div class="dashboard-card" style="height: 450px;">
-                    <h3>资产运营风险监控与生命周期预警</h3>
-                    <div class="canvas-wrapper"><canvas id="chartAct5RiskMonitor"></canvas></div>
+
+                <!-- 五级资产分布概览 -->
+                <div class="dashboard-card act5-card">
+                    <h3>五级资产分布概览</h3>
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <div class="tier-funnel" id="tierFunnel"></div>
+                        <div id="tierDetailBox" class="tier-detail-box">
+                            点击上方各级色块查看该级说明
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 单件专利评分模拟 -->
+                <div class="score-calculator">
+                    <h3>单件专利评分模拟</h3>
+                    <div class="calc-row">
+                        <div class="calc-row-head">
+                            <span class="cr-name">授权状态</span>
+                            <span><span class="cr-score" id="s1val">35</span> <span class="cr-max">/ 35</span></span>
+                        </div>
+                        <input class="calc-slider" type="range" min="0" max="35" value="35" step="5" id="s1" oninput="updateAct5Calc()">
+                        <div class="calc-slider-labels">
+                            <span>失效 (0)</span><span>审查中 (15)</span><span>已授权 (35)</span>
+                        </div>
+                    </div>
+                    <div class="calc-row">
+                        <div class="calc-row-head">
+                            <span class="cr-name">被引次数</span>
+                            <span><span class="cr-score" id="s2val">0</span> <span class="cr-max">/ 30</span></span>
+                        </div>
+                        <input class="calc-slider" type="range" min="0" max="30" value="0" id="s2" oninput="updateAct5Calc()">
+                    </div>
+                    <div class="calc-row">
+                        <div class="calc-row-head">
+                            <span class="cr-name">同族数量</span>
+                            <span><span class="cr-score" id="s3val">0</span> <span class="cr-max">/ 20</span></span>
+                        </div>
+                        <input class="calc-slider" type="range" min="0" max="20" value="0" id="s3" oninput="updateAct5Calc()">
+                    </div>
+                    <div class="calc-row">
+                        <div class="calc-row-head">
+                            <span class="cr-name">技术活跃度</span>
+                            <span><span class="cr-score" id="s4val">8</span> <span class="cr-max">/ 15</span></span>
+                        </div>
+                        <input class="calc-slider" type="range" min="2" max="15" value="8" id="s4" oninput="updateAct5Calc()">
+                        <div class="calc-slider-labels">
+                            <span>冷门赛道</span><span>中热赛道</span><span>高热赛道</span>
+                        </div>
+                    </div>
+                    <div class="calc-result" id="calcResult">
+                        <div>
+                            <div class="calc-result-label">综合得分</div>
+                            <div class="result-score-big" id="totalScore">43</div>
+                        </div>
+                        <div class="result-tier-badge" id="tierBadge">B 级</div>
+                        <div class="result-advice" id="tierAdvice">得分处于中等区间，具备一定授权基础，可关注引用与同族数据以提升综合评级。</div>
+                    </div>
+                </div>
+
+                <!-- 资产生命周期风险分布 -->
+                <div class="dashboard-card act5-card" style="grid-column:1/-1;">
+                    <h3>资产生命周期风险分布</h3>
+                    <div class="risk-timeline" id="riskTimeline"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="narrativeAct6" class="narrative-section">
+            <div class="act6-intro">
+                桑基图展示专利从<strong>申请年份</strong>到<strong>专利类型</strong>再到<strong>法律状态</strong>的三层流转关系。流量宽度正比于该路径上的专利数量，可直观看出不同时期的技术布局重心与最终审查结果。
+            </div>
+            <div class="dashboard-card act6-card">
+                <h3>专利生命周期桑基图（申请年份 → 专利类型 → 法律状态）</h3>
+                <div id="act6SankeyContainer" style="width:100%; height:620px; position:relative;">
+                    <svg id="act6SankeySvg" width="100%" height="100%"></svg>
                 </div>
             </div>
         </div>
@@ -158,6 +259,7 @@
     <script src="acts/act3/act3.js"></script>
     <script src="acts/act4/act4.js"></script>
     <script src="acts/act5/act5.js"></script>
+    <script src="acts/act6/act6.js"></script>
 </body>
 
 </html>

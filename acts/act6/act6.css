@@ -1,0 +1,61 @@
+/* Act 6: 专利生命周期桑基图 */
+
+.act6-intro {
+    background: #f1f5f9;
+    border-left: 3px solid var(--emerald-accent);
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    letter-spacing: 0.5px;
+}
+.act6-intro strong { color: var(--emerald-accent); }
+
+.act6-card {
+    background: #ffffff !important;
+    border: 1px solid var(--border-glow) !important;
+    border-radius: 8px !important;
+    overflow: hidden;
+}
+
+/* 桑基图节点标签 */
+.sankey-node-label {
+    font-size: 11px;
+    fill: var(--text-primary);
+    pointer-events: none;
+    font-family: 'Noto Sans SC', sans-serif;
+}
+.sankey-node-value {
+    font-size: 9px;
+    fill: var(--text-secondary);
+    pointer-events: none;
+}
+
+/* 桑基图链路 */
+.sankey-link {
+    fill-opacity: 0.25;
+    stroke: none;
+    cursor: pointer;
+    transition: fill-opacity 0.2s;
+}
+.sankey-link:hover {
+    fill-opacity: 0.5;
+}
+
+/* 桑基图节点矩形 */
+.sankey-node {
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.sankey-node:hover {
+    opacity: 0.8;
+}
+
+/* 图层标题 */
+.sankey-layer-title {
+    font-size: 12px;
+    fill: var(--text-secondary);
+    font-weight: 600;
+    letter-spacing: 1px;
+}

@@ -1,1 +1,212 @@
-/* Act 5: 价值预警矩阵专属样式 */
+/* Act 5: 价值评估矩阵专属样式 */
+
+/* 叙事引言 */
+.act5-intro {
+    background: #f1f5f9;
+    border-left: 3px solid var(--amber-accent);
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    letter-spacing: 0.5px;
+}
+.act5-intro strong { color: var(--amber-accent); }
+
+/* 主布局 */
+.act5-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 16px;
+}
+
+/* 评分指标行 */
+.act5-scoring-row {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.score-indicator {
+    background: #ffffff;
+    border: 1px solid var(--border-glow);
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    cursor: default;
+    transition: border-color 0.2s;
+    border-radius: 8px;
+}
+.score-indicator:hover { border-color: var(--cyan-accent); }
+.score-indicator .si-label { font-size: 10px; color: var(--text-secondary); letter-spacing: 1px; }
+.score-indicator .si-name  { font-size: 13px; color: var(--text-primary); font-weight: 600; }
+.score-indicator .si-range { font-size: 11px; color: var(--text-secondary); }
+.score-indicator .si-bar   { height: 3px; border-radius: 1px; margin-top: 4px; }
+
+/* 五级色 */
+.tier-s  { --tc: #d97706; }
+.tier-a  { --tc: #f59e0b; }
+.tier-b  { --tc: #059669; }
+.tier-c  { --tc: #0284c7; }
+.tier-d  { --tc: #94a3b8; }
+
+/* 五级漏斗/阶梯 */
+.tier-funnel {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 120px;
+    padding: 0 4px;
+}
+.tier-bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.tier-bar-wrap:hover { opacity: 0.85; }
+.tier-bar-wrap.dimmed { opacity: 0.3; }
+.tier-bar-inner { width: 100%; border-radius: 3px 3px 0 0; transition: height 0.4s; }
+.tier-bar-count { font-size: 11px; color: var(--text-secondary); }
+.tier-bar-label { font-size: 10px; color: var(--text-secondary); letter-spacing: 1px; }
+
+/* 详情框 */
+.tier-detail-box {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    padding: 10px;
+    background: #f8fafc;
+    border: 1px solid var(--border-glow);
+    min-height: 64px;
+    border-radius: 6px;
+}
+
+/* 评分器互动区 */
+.score-calculator {
+    background: #ffffff;
+    border: 1px solid var(--border-glow);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    border-radius: 8px;
+}
+.score-calculator h3 {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-primary);
+    border-left: 3px solid var(--cyan-accent);
+    padding-left: 6px;
+    line-height: 1.4;
+}
+
+.calc-row {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.calc-row-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+.calc-row-head .cr-name  { font-size: 12px; color: var(--text-secondary); }
+.calc-row-head .cr-score { font-size: 12px; color: var(--amber-accent); font-weight: 600; }
+.calc-row-head .cr-max   { font-size: 11px; color: var(--text-secondary); }
+
+.calc-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: #e2e8f0;
+    outline: none;
+    border-radius: 2px;
+    cursor: pointer;
+}
+.calc-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--cyan-accent);
+    cursor: pointer;
+    border: 2px solid #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.calc-slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-secondary);
+}
+
+.calc-result {
+    background: #f8fafc;
+    border: 1px solid var(--border-glow);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-radius: 6px;
+}
+.calc-result-label {
+    font-size: 10px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+}
+.result-score-big {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--amber-accent);
+}
+.result-tier-badge {
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    border: 1px solid;
+    border-radius: 4px;
+}
+.result-advice {
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    flex: 1;
+}
+
+/* 风险时间轴 */
+.risk-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 4px 0;
+}
+.risk-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+}
+.risk-row .rr-label { width: 90px; color: var(--text-secondary); flex-shrink: 0; }
+.risk-row .rr-bar-bg { flex: 1; height: 16px; background: #f1f5f9; border-radius: 3px; overflow: hidden; }
+.risk-row .rr-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+.risk-row .rr-count { width: 40px; text-align: right; color: var(--text-secondary); }
+
+/* 卡片覆盖样式 */
+.act5-card {
+    background: #ffffff !important;
+    border: 1px solid var(--border-glow) !important;
+    border-radius: 8px !important;
+}
