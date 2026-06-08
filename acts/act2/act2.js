@@ -74,17 +74,17 @@ function renderAct2() {
             roam: 'move',  // 只允许拖拽平移，禁用滚轮缩放（缩放交给浏览器页面缩放）
             aspectScale: 0.75,
             selectedMode: false,
-            zoom: 1,
+            zoom: 1.25,
             label: {
                 show: true,
                 position: 'top',
-                fontSize: 9,
+                fontSize: 10,
                 color: '#666'
             },
             emphasis: {
                 label: {
                     show: true,
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: 'bold',
                     color: '#333'
                 },

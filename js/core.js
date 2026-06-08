@@ -22,20 +22,32 @@ function initScrollSpy() {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const id = entry.target.id;
-                const match = id.match(/narrativeAct(\d)/);
-                if (match) {
-                    const actNum = parseInt(match[1]);
-                    tabs.forEach((t, i) => t.classList.toggle('active', (i + 1) === actNum));
-                }
+                tabs.forEach(t => {
+                    t.classList.toggle('active', t.dataset.section === id);
+                });
             }
         });
     }, {
-        // 顶部导航栏占约120px，所以rootMargin往上缩
         rootMargin: '-120px 0px -60% 0px',
         threshold: 0
     });
 
     sections.forEach(s => observer.observe(s));
+}
+
+// 数据溯源页卡片交互
+function toggleDSCard(key) {
+    const card = document.getElementById(`dsCard-${key}`);
+    if (!card) return;
+    // 移除所有卡片的激活状态
+    document.querySelectorAll('.ds-card').forEach(c => c.classList.remove('ds-card-active'));
+    document.querySelectorAll('.dj-step').forEach(s => s.classList.remove('dj-active'));
+    // 激活目标卡片
+    card.classList.add('ds-card-active');
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // 激活对应流程步骤
+    const step = card.closest('.narrative-section')?.querySelector(`.dj-step[onclick*="'${key}'"]`);
+    if (step) step.classList.add('dj-active');
 }
 
 // 页面加载后读取 patent.csv
