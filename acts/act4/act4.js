@@ -123,7 +123,7 @@ function renderAct4() {
             .attr("cursor", "pointer");
 
         node.append("circle")
-            .attr("r", d => Math.max(5, Math.min(25, 4 + Math.sqrt(d.size / maxSize) * 20)))
+            .attr("r", d => Math.max(5, Math.min(40, 4 + Math.sqrt(d.size / maxSize) * 20)))
             .attr("fill", d => ["#059669", "#0284c7", "#6366f1", "#d97706"][d.group])
             .attr("fill-opacity", 0.85)
             .attr("stroke", "#fff")
@@ -138,7 +138,7 @@ function renderAct4() {
                 const name = d.id;
                 return name.length > 6 ? name.substring(0, 6) + '…' : name;
             })
-            .attr("fill", "#1e293b")
+            // .attr("fill", "rgba(100,116,139,0.18)")
             .style("font-size", "8px")
             .style("font-weight", "600")
             .style("pointer-events", "none");

@@ -21,9 +21,8 @@ function renderAct2() {
         value: value
     }));
 
-    // 计算最大最小值
-    const counts = Object.values(provinceRanking);
-    const maxVal = counts.length > 0 ? Math.max(...counts) : 100;
+    // 图例最大值固定为 2000，便于跨时间切片对比
+    const maxVal = 2000;
     const minVal = 0;
 
     const option = {

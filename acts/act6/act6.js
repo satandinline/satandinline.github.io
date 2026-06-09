@@ -104,7 +104,7 @@ function renderAct6() {
     var H = container.clientHeight || 620;
     var margin = { top: 45, bottom: 20, left: 80, right: 80 };
     var nodeW = 16;
-    var nodePad = 5;
+    var nodePad = 8;
 
     var xPositions = [
         margin.left,
@@ -117,17 +117,35 @@ function renderAct6() {
         if (li === 0) layer.sort(function(a, b) { return a.name.localeCompare(b.name); });
         else layer.sort(function(a, b) { return b.value - a.value; });
 
-        var totalVal = layer.reduce(function(s, n) { return s + n.value; }, 0);
+        // 使用平方根压缩高度，避免数据差异过大导致小节点拥挤
+        var sqrtVals = layer.map(function(n) { return Math.sqrt(n.value); });
+        var totalSqrt = sqrtVals.reduce(function(s, v) { return s + v; }, 0);
         var availH = H - margin.top - margin.bottom - (layer.length - 1) * nodePad;
         if (availH < 1) availH = 1;
+        // 第一轮：按 sqrt 比例分配高度，保证最小 10px
+        var heights = layer.map(function(node, i) {
+            return totalSqrt > 0 ? Math.max(10, (sqrtVals[i] / totalSqrt) * availH) : 10;
+        });
+        // 如果总高度超出可用空间，等比缩放（保持最小高度）
+        var totalH = heights.reduce(function(s, h) { return s + h; }, 0);
+        if (totalH > availH) {
+            var minH = 10;
+            var excess = totalH - availH;
+            var shrinkable = heights.reduce(function(s, h) { return s + Math.max(0, h - minH); }, 0);
+            if (shrinkable > 0) {
+                heights = heights.map(function(h) {
+                    var extra = Math.max(0, h - minH);
+                    return h - (extra / shrinkable) * excess;
+                });
+            }
+        }
         var y = margin.top;
-        layer.forEach(function(node) {
-            var h = totalVal > 0 ? Math.max(4, (node.value / totalVal) * availH) : 4;
+        layer.forEach(function(node, i) {
             node.x0 = xPositions[li];
             node.x1 = node.x0 + nodeW;
             node.y0 = y;
-            node.y1 = y + h;
-            y += h + nodePad;
+            node.y1 = y + heights[i];
+            y += heights[i] + nodePad;
         });
     });
 
@@ -270,7 +288,7 @@ function renderAct6() {
             .attr('text-anchor', anchor)
             .text(d.name);
 
-        if (minH > 12) {
+        if (minH > 8) {
             g.append('text')
                 .attr('class', 'sankey-node-value')
                 .attr('x', tx)

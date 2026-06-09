@@ -92,7 +92,7 @@
             <div class="scene-header">
                 <span class="scene-num">DATA SOURCE</span>
                 <h2 class="scene-title">数据溯源</h2>
-                <p class="scene-subtitle">这不是一套单一来源的数据。我们以智慧牙专利数据库为起点，经过多轮筛选与加工，将原始专利记录变成了可以看得见、摸得着的可视化数据集。</p>
+                <p class="scene-subtitle">这不是一套单一来源的数据。我们以智慧芽专利数据库为起点，经过多轮筛选与加工，将原始专利记录变成了可以看得见、摸得着的可视化数据集。</p>
             </div>
 
             <!-- 数据旅程流程图 -->
@@ -100,7 +100,7 @@
                 <div class="dj-step" onclick="toggleDSCard('src')">
                     <div class="dj-num">01</div>
                     <div class="dj-label">数据采集</div>
-                    <div class="dj-sub">智慧牙专利库</div>
+                    <div class="dj-sub">智慧芽专利库</div>
                 </div>
                 <div class="dj-arrow">→</div>
                 <div class="dj-step" onclick="toggleDSCard('filter')">
@@ -133,9 +133,9 @@
                 <div class="ds-card" id="dsCard-src">
                     <div class="ds-card-head">
                         <span class="ds-card-num">01</span>
-                        <h3>数据来源：智慧牙专利数据库</h3>
+                        <h3>数据来源：智慧芽专利数据库</h3>
                     </div>
-                    <p>智慧牙（PatSnap）是全球领先的专利检索与分析平台，覆盖全球大多数国家和地区的专利数据。以“人型机器人”为关键词进行检索，经去重后相关专利信息作为原始数据。</p>
+                    <p>智慧芽（PatSnap）是全球领先的专利检索与分析平台，覆盖全球大多数国家和地区的专利数据。以“人型机器人”为关键词检索2026年5月12日及之前的数据，经patsnap同族筛选（每族patsnap同族一个专利代表）、去重后相关专利信息作为原始数据。</p>
                 </div>
                 <div class="ds-card" id="dsCard-filter">
                     <div class="ds-card-head">
@@ -180,7 +180,7 @@
             <!-- 数据处理说明 -->
             <div class="ds-processing-note">
                 <h3>数据处理说明</h3>
-                <p>所有数据均来源于智慧牙专利数据库的检索导出，筛选条件为“人型机器人”相关发明与实用新型专利。原始数据经过去重、字段标准化、省份映射等清洗步骤后得到 patent.csv。派生表格均由 patent.csv 通过 Python 脚本加工生成，其中 IPC 分类号拆解采用一对多展开，省份统计剔除了“未知”及境外记录。前端可视化采用 D3.js、ECharts 等库实现交互呈现。</p>
+                <p>所有数据均来源于智慧芽专利数据库的检索导出，筛选条件为“人型机器人”相关发明与实用新型专利。原始数据经过去重、字段标准化、省份映射等清洗步骤后得到 patent.csv。派生表格均由 patent.csv 通过 Python 脚本加工生成，其中 IPC 分类号拆解采用一对多展开，省份统计剔除了“未知”及境外记录。前端可视化采用 D3.js、ECharts 等库实现交互呈现。</p>
             </div>
         </div>
 
@@ -191,7 +191,7 @@
                 <p class="scene-subtitle">创新的基本盘，藏在专利的法律结构与总量分布中</p>
             </div>
             <div class="act-intro">
-                每一件专利背后，都是一次对"让机器更像人"这个命题的回答。审查、授权、驳回与放弃，构成了技术演进的自然筛选机制。法律状态、技术分布、城市集聚与高价值资产，共同构成这份全景的四个切面。
+                每一件专利背后，都是一次对<strong>“让机器更像人”</strong>这个命题的回答。审查、授权、驳回与放弃，构成了技术演进的<strong>自然筛选机制</strong>。法律状态、技术分布、城市集聚与高价值资产，共同构成这份全景的<strong>四个切面</strong>。
             </div>
             <div class="story-text">
                 <p>专利审查结构是一个鲜明的<span class="story-highlight">金字塔</span>：仅 <span class="story-data">38.9%</span> 拿到授权，超过半数（<span class="story-data">52.1%</span>）还在排队等待审查，<span class="story-data">8.8%</span> 被驳回或撤回，仅 <span class="story-data">0.1%</span> 已经失效。这个领域超过一半的创新，仍在接受市场与法律的双重检验——竞争激烈程度不言而喻。</p>
@@ -246,7 +246,7 @@
                 <p class="scene-subtitle">创新落在哪里，产业就生长在哪里</p>
             </div>
             <div class="act-intro">
-                专利不是均匀撒落的。它跟着高校、制造链和政策洼地走。广东、上海、北京三地合计占据超过半数份额——这是产业土壤与科研资源共同筛选的结果。
+                专利不是均匀撒落的。它<strong>跟着高校、制造链和政策洼地走</strong>。广东、上海、北京三地合计占据<strong>超过半数份额</strong>——这是产业土壤与科研资源共同筛选的结果。
             </div>
             <div class="story-text">
                 <p><span class="story-highlight">珠三角、长三角、京津冀</span>三大城市群是中国机器人创新的主战场。广东省以 <span class="story-data">1,697 件</span>专利一骑绝尘，上海紧随其后，北京位列第三。这些地区制造业根基深厚，高校和科研院所密集，“产学研用”早已深度融合在一起。</p>
@@ -270,7 +270,7 @@
                 <p class="scene-subtitle">IPC 分类号的共现关系，正是技术融合走向的「地下管线」</p>
             </div>
             <div class="act-intro">
-                当一件专利同时涉及"机械手"和"控制系统"，就意味着这两个领域正在发生真实的耦合。共现越密集，技术边界越模糊——这正是跨赛道创新的底层信号。
+                当一件专利同时涉及“机械手”和“控制系统”，就意味着这两个领域正在发生真实的耦合。共现越密集，<strong>技术边界越模糊</strong>——这正是<strong>跨赛道创新</strong>的底层信号。
             </div>
             <div class="story-text">
                 <p>技术融合正在织成一张越来越密的<span class="story-highlight">网</span>。运动执行、结构仿生、智能控制三大领域各自快速生长，它们之间的连线也越来越多——技术边界在模糊，跨界创新的机会窗口正在打开。对后来者来说，这正是弯道超车的最好时机。</p>
@@ -307,7 +307,7 @@
                 <p class="scene-subtitle">高校守住基础研究，企业收拢应用集成</p>
             </div>
             <div class="act-intro">
-                头部申请机构的竞争格局已相对固化，但结构性变化仍在发生。高校系在传感与算法领域持续发力，产业系则在运动控制与整机集成方向快速收拢。同一 IPC 细分领域的重叠布局，构成了最直接的竞争关系。
+                头部申请机构的<strong>竞争格局已相对固化</strong>，但结构性变化仍在发生。高校系在传感与算法领域持续发力，产业系则在运动控制与整机集成方向快速收拢。同一 IPC 细分领域的<strong>重叠布局</strong>，构成了最直接的竞争关系。
             </div>
             <div class="story-text">
                 <p>把镜头从技术转向人——申请人协作网络映射出产业竞争的真实<span class="story-highlight">生态</span>。头部企业在核心领域的专利布局高度重叠，竞争针尖对麦芒；另一面，产学研合作却在加速打通，高校与企业之间的技术转移越来越频繁。竞争与合作并存，这才是当下产业生态的全貌。</p>
@@ -344,7 +344,7 @@
                 <p class="scene-subtitle">不是所有专利都值得长期持有</p>
             </div>
             <div class="act-intro">
-                授权状态、被引次数、同族数量与技术活跃度，四项指标加权合成百分制评分。得分高低决定了资产的运营策略——是重点维护、许可变现，还是评估放弃。金字塔尖的 S 级资产，往往只占个位数比例。
+                授权状态、被引次数、同族数量与技术活跃度，四项指标加权合成<strong>百分制评分</strong>。得分高低决定了资产的运营策略——是重点维护、许可变现，还是评估放弃。<strong>金字塔尖的 S 级资产</strong>，往往只占个位数比例。
             </div>
             <div class="story-text">
                 <p>专利价值怎么评？四个指标加权打分：授权状态占 <span class="story-data">35 分</span>，被引次数占 <span class="story-data">30 分</span>，同族数量占 <span class="story-data">20 分</span>，技术活跃度占 <span class="story-data">15 分</span>。这套评分体系综合考虑了法律确权、学术影响力、国际布局和市场前景，能较为客观地评估每件专利的综合价值。</p>
@@ -458,7 +458,7 @@
                 <p class="scene-subtitle">从机械结构到智能感知，研究重心如何迁移</p>
             </div>
             <div class="act-intro">
-                同一批专利，按时间切片后，能看到技术关注点的漂移。早期的流量全部集中在机械手本体，近年的流量逐步向控制、视觉、智能、学习等方向扩散。中间的关键词层，是连接时间与技术赛道的桥梁。
+                同一批专利，按时间切片后，能看到技术关注点的<strong>漂移</strong>。早期的流量全部集中在机械手本体，近年的流量逐步向控制、视觉、智能、学习等方向<strong>扩散</strong>。中间的关键词层，是连接时间与<strong>技术赛道</strong>的桥梁。
             </div>
             <div class="story-text">
                 <p>把时间轴拉开，技术演进的脉络一目了然。<span class="story-data">2000-2010 年</span>是萌芽期，几乎所有研究都聚焦在机器人本体技术，没有明显分支。<span class="story-data">2011-2015 年</span>专利总量突破千件，控制和驱动方向开始冒头。<span class="story-data">2016 年</span>是真正的拐点——此后四年专利量激增至万件级，控制技术迅速成长为第二大方向。<span class="story-data">2020-2024 年</span>产业全面爆发，近五年总量超过前二十年总和的两倍，计算机视觉、机器学习等新兴赛道也开始崭露头角。</p>

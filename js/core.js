@@ -43,18 +43,33 @@ function initNavbarAutoHide() {
 
     let hidden = false;
 
-    function hideNavbar() {
+    // 图表交互时需要同步淡出的场景文字元素
+    const sceneTextSelectors = '.scene-header, .act-intro, .story-text';
+
+    function getSceneTextElements() {
+        const activeSection = document.querySelector('.narrative-section.active');
+        return activeSection
+            ? activeSection.querySelectorAll(sceneTextSelectors)
+            : [];
+    }
+
+    function hideAll() {
         if (!hidden) {
             navbar.classList.add('navbar-hidden');
             tabbar.classList.add('navbar-hidden');
+            // Act 2/3/4 场景文字淡出
+            getSceneTextElements().forEach(el => el.classList.add('chart-focus-hidden'));
             hidden = true;
         }
     }
 
-    function showNavbar() {
+    function showAll() {
         if (hidden) {
             navbar.classList.remove('navbar-hidden');
             tabbar.classList.remove('navbar-hidden');
+            document.querySelectorAll('.chart-focus-hidden').forEach(el =>
+                el.classList.remove('chart-focus-hidden')
+            );
             hidden = false;
         }
     }
@@ -67,29 +82,30 @@ function initNavbarAutoHide() {
     ];
 
     document.addEventListener('mousedown', (e) => {
-        // 如果点击的是导航栏或标签栏区域，恢复显示
+        // 点击导航栏或标签栏：恢复显示
         if (navbar.contains(e.target) || tabbar.contains(e.target)) {
-            showNavbar();
+            showAll();
             return;
         }
-        // 如果点击的是图表相关区域，隐藏
+        // 点击图表区域：隐藏所有非图表元素
         const inChart = chartSelectors.some(sel => e.target.closest(sel));
         if (inChart) {
-            hideNavbar();
+            hideAll();
+        } else {
+            // 点击其他位置（如场景文字、空白处）：恢复显示
+            showAll();
         }
     });
 
-    // 滚动到页面顶部时恢复显示
+    // 滚动时恢复显示（向上滚动或滚到顶部）
     let lastScrollY = window.scrollY;
     window.addEventListener('scroll', () => {
         const currentY = window.scrollY;
-        // 滚到顶部附近（100px 内）时恢复
         if (currentY < 100) {
-            showNavbar();
+            showAll();
         }
-        // 向上滚动时也恢复（用户想回到导航栏）
         if (currentY < lastScrollY - 5) {
-            showNavbar();
+            showAll();
         }
         lastScrollY = currentY;
     }, { passive: true });
