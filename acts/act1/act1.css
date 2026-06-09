@@ -44,15 +44,15 @@
 }
 
 .hub-central-core>span:first-child {
-    font-size: 11px;
+    font-size: 12px;
 }
 
 .hub-central-core #metricTotalCount {
-    font-size: 26px;
+    font-size: 28px;
     line-height: 1.2;
 }
 
 .hub-central-core #metricSubDateRange {
-    font-size: 9px;
+    font-size: 10px;
     white-space: nowrap;
 }
