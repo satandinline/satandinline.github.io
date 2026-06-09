@@ -1,4 +1,4 @@
-:root {
+﻿:root {
     --bg-deep: #f0f4f8;
     --bg-card: #ffffff;
     --bg-alt: #f0f4f8;
@@ -41,7 +41,7 @@ body {
 .top-navbar h1 {
     margin: 0;
     font-family: 'SimHei', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
-    font-size: 32px;
+    font-size: 44px;
     color: #1e293b;
     font-weight: 400;
     letter-spacing: 6px;
@@ -96,7 +96,7 @@ body {
     padding: 10px 20px;
     cursor: pointer;
     border-radius: 6px;
-    font-size: 15px;
+    font-size: 21px;
     font-weight: 500;
     transition: 0.2s;
 }
@@ -152,7 +152,7 @@ body {
 .dashboard-card h3 {
     margin: 0 0 6px 0;
     font-family: 'Noto Serif SC', 'Noto Sans SC', serif;
-    font-size: 15px;
+    font-size: 21px;
     font-weight: 600;
     color: var(--text-primary);
     border-left: 3px solid var(--cyan-accent);
@@ -172,7 +172,7 @@ body {
 .tooltip {
     position: absolute;
     padding: 8px;
-    font-size: 13px;
+    font-size: 18px;
     background: rgba(255, 255, 255, 0.98);
     color: var(--text-primary);
     border: 1px solid rgba(0,0,0,0.1);
@@ -205,7 +205,7 @@ body {
 }
 .scene-num {
     display: inline-block;
-    font-size: 12px;
+    font-size: 17px;
     color: var(--cyan-accent);
     letter-spacing: 4px;
     font-weight: 600;
@@ -215,14 +215,14 @@ body {
 .scene-title {
     margin: 4px 0 6px 0;
     font-family: 'Noto Serif SC', 'Noto Sans SC', serif;
-    font-size: 30px;
+    font-size: 42px;
     font-weight: 700;
     color: var(--text-primary);
     letter-spacing: 2px;
 }
 .scene-subtitle {
     margin: 0;
-    font-size: 17px;
+    font-size: 23px;
     color: var(--text-secondary);
     letter-spacing: 0.5px;
     font-weight: 300;
@@ -234,7 +234,7 @@ body {
     padding: 16px 20px;
     margin-bottom: 20px;
     font-family: 'Noto Serif SC', 'Noto Sans SC', serif;
-    font-size: 19px;
+    font-size: 26px;
     color: var(--text-primary);
     line-height: 2;
     letter-spacing: 0.5px;
@@ -299,7 +299,7 @@ body {
     letter-spacing: 4px;
 }
 .prologue-section .prologue-title {
-    font-size: 40px;
+    font-size: 55px;
     font-weight: 800;
     color: #fff;
     margin: 0 0 12px 0;
@@ -308,7 +308,7 @@ body {
     text-shadow: 0 2px 16px rgba(0,0,0,0.35);
 }
 .prologue-section .prologue-subtitle {
-    font-size: 16px;
+    font-size: 22px;
     color: rgba(255,255,255,0.75);
     margin: 0 0 32px 0;
     line-height: 1.6;
@@ -322,7 +322,7 @@ body {
     margin-bottom: 0;
 }
 .prologue-block h3 {
-    font-size: 16px;
+    font-size: 22px;
     font-weight: 600;
     color: rgba(255,255,255,0.95);
     margin: 0 0 8px 0;
@@ -331,7 +331,7 @@ body {
     letter-spacing: 0.5px;
 }
 .prologue-block p {
-    font-size: 14.5px;
+    font-size: 20px;
     color: rgba(255,255,255,0.72);
     line-height: 2;
     margin: 0;
@@ -341,7 +341,7 @@ body {
 
 /* ── 故事性描述段落 ── */
 .story-text {
-    font-size: 15px;
+    font-size: 21px;
     color: var(--text-secondary);
     line-height: 2.1;
     letter-spacing: 0.3px;
@@ -355,19 +355,19 @@ body {
 .story-text .story-highlight {
     color: var(--cyan-accent);
     font-weight: 500;
-    font-size: 16px;
+    font-size: 22px;
 }
 .story-text .story-data {
     color: var(--amber-accent);
     font-weight: 700;
-    font-size: 16px;
+    font-size: 22px;
 }
 .story-summary {
     background: rgba(5, 150, 105, 0.06);
     border-left: 3px solid var(--emerald-accent);
     padding: 12px 16px;
     margin-top: 14px;
-    font-size: 15px;
+    font-size: 21px;
     font-style: italic;
     color: var(--text-secondary);
     line-height: 2;
@@ -421,14 +421,14 @@ body {
     box-shadow: 0 8px 32px rgba(0,0,0,0.25);
 }
 .epilogue-section .epilogue-title {
-    font-size: 24px;
+    font-size: 34px;
     font-weight: 700;
     color: #fff;
     margin: 0 0 24px 0;
     letter-spacing: 1.5px;
 }
 .epilogue-section p {
-    font-size: 14.5px;
+    font-size: 20px;
     color: rgba(255,255,255,0.75);
     line-height: 2;
     margin: 0 0 12px 0;
@@ -436,7 +436,7 @@ body {
     letter-spacing: 0.3px;
 }
 .epilogue-section .epilogue-closing {
-    font-size: 17px;
+    font-size: 23px;
     color: #fff;
     font-weight: 500;
     text-align: center;
@@ -478,23 +478,23 @@ body {
     box-shadow: 0 2px 12px rgba(2,132,199,0.15);
 }
 .dj-num {
-    font-size: 26px;
+    font-size: 36px;
     font-weight: 700;
     color: var(--cyan-accent);
     margin-bottom: 4px;
 }
 .dj-label {
-    font-size: 15px;
+    font-size: 21px;
     font-weight: 600;
     color: var(--text-primary);
 }
 .dj-sub {
-    font-size: 13px;
+    font-size: 18px;
     color: var(--text-secondary);
     margin-top: 2px;
 }
 .dj-arrow {
-    font-size: 20px;
+    font-size: 29px;
     color: var(--text-secondary);
     padding: 0 6px;
     opacity: 0.5;
@@ -539,20 +539,20 @@ body {
     margin-bottom: 10px;
 }
 .ds-card-num {
-    font-size: 30px;
+    font-size: 42px;
     font-weight: 800;
     color: var(--cyan-accent);
     opacity: 0.3;
     line-height: 1;
 }
 .ds-card-head h3 {
-    font-size: 16px;
+    font-size: 22px;
     font-weight: 600;
     color: var(--text-primary);
     margin: 0;
 }
 .ds-card p {
-    font-size: 14px;
+    font-size: 20px;
     color: var(--text-secondary);
     line-height: 1.9;
     margin: 0;
@@ -578,14 +578,14 @@ body {
     background: rgba(2,132,199,0.1);
 }
 .ds-file {
-    font-size: 14px;
+    font-size: 20px;
     font-weight: 600;
     color: var(--cyan-accent);
     font-family: 'Consolas', monospace;
     white-space: nowrap;
 }
 .ds-desc {
-    font-size: 13.5px;
+    font-size: 19px;
     color: var(--text-secondary);
     line-height: 1.8;
 }
@@ -597,13 +597,13 @@ body {
     border-radius: 0 8px 8px 0;
 }
 .ds-processing-note h3 {
-    font-size: 15px;
+    font-size: 21px;
     font-weight: 600;
     color: var(--emerald-accent);
     margin: 0 0 8px 0;
 }
 .ds-processing-note p {
-    font-size: 14px;
+    font-size: 20px;
     color: var(--text-secondary);
     line-height: 1.9;
     margin: 0;
@@ -616,7 +616,7 @@ body {
     margin-bottom: 8px;
 }
 .act-transition p {
-    font-size: 14px;
+    font-size: 20px;
     color: var(--text-secondary);
     font-style: italic;
     letter-spacing: 0.5px;
@@ -625,7 +625,7 @@ body {
 }
 .act-transition .trans-arrow {
     display: block;
-    font-size: 20px;
+    font-size: 29px;
     color: var(--cyan-accent);
     opacity: 0.4;
     margin-top: 6px;

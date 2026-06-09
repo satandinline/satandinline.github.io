@@ -1,4 +1,4 @@
-/* Act 1 全景仪表盘样式 */
+﻿/* Act 1 全景仪表盘样式 */
 
 .hub-spoke-grid {
     display: grid;
@@ -44,15 +44,15 @@
 }
 
 .hub-central-core>span:first-child {
-    font-size: 12px;
+    font-size: 17px;
 }
 
 .hub-central-core #metricTotalCount {
-    font-size: 28px;
+    font-size: 39px;
     line-height: 1.2;
 }
 
 .hub-central-core #metricSubDateRange {
-    font-size: 10px;
+    font-size: 14px;
     white-space: nowrap;
 }

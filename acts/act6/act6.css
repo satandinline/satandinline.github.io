@@ -9,13 +9,13 @@
 
 /* 桑基图节点标签 */
 .sankey-node-label {
-    font-size: 12px;
+    font-size: 13px;
     fill: var(--text-primary);
     pointer-events: none;
     font-family: 'Noto Sans SC', sans-serif;
 }
 .sankey-node-value {
-    font-size: 10px;
+    font-size: 11px;
     fill: var(--text-secondary);
     pointer-events: none;
 }
@@ -42,7 +42,7 @@
 
 /* 图层标题 */
 .sankey-layer-title {
-    font-size: 13px;
+    font-size: 18px;
     fill: var(--text-secondary);
     font-weight: 600;
     letter-spacing: 1px;
