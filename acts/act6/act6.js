@@ -174,7 +174,7 @@ function renderAct6() {
 
     // 年份区间颜色：从浅到深的蓝绿梯度
     var periodColors = {
-        '2000-2010': '#94a3b8',
+        '2000-2010': '#64748b',
         '2011-2015': '#0891b2',
         '2016-2019': '#0284c7',
         '2020-2024': '#1e40af'
@@ -186,7 +186,7 @@ function renderAct6() {
         .range(['#059669', '#0284c7', '#d97706', '#e11d48', '#7c3aed', '#0891b2', '#65a30d', '#db2777', '#4f46e5', '#ea580c']);
 
     function nodeColor(node) {
-        if (node.layer === 0) return periodColors[node.name] || '#94a3b8';
+        if (node.layer === 0) return periodColors[node.name] || '#64748b';
         if (node.layer === 1) return topicColor;
         return ipcColors(node.name);
     }

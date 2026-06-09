@@ -2,7 +2,7 @@
 
 /* 叙事引言 */
 .act5-intro {
-    background: #f1f5f9;
+    background: rgba(2,132,199,0.06);
     border-left: 3px solid var(--amber-accent);
     padding: 14px 18px;
     margin-bottom: 20px;
@@ -83,7 +83,7 @@
     color: var(--text-secondary);
     line-height: 1.8;
     padding: 10px;
-    background: #f8fafc;
+    background: #ffffff;
     border: 1px solid var(--border-glow);
     min-height: 64px;
     border-radius: 6px;
@@ -150,7 +150,7 @@
 }
 
 .calc-result {
-    background: #f8fafc;
+    background: #ffffff;
     border: 1px solid var(--border-glow);
     padding: 12px 16px;
     display: flex;
@@ -200,7 +200,7 @@
     font-size: 12px;
 }
 .risk-row .rr-label { width: 90px; color: var(--text-secondary); flex-shrink: 0; }
-.risk-row .rr-bar-bg { flex: 1; height: 16px; background: #f1f5f9; border-radius: 3px; overflow: hidden; }
+.risk-row .rr-bar-bg { flex: 1; height: 16px; background: #ffffff; border-radius: 3px; overflow: hidden; }
 .risk-row .rr-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
 .risk-row .rr-count { width: 40px; text-align: right; color: var(--text-secondary); }
 

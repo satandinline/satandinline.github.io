@@ -65,7 +65,7 @@ function renderAct3() {
                 .style("background", "rgba(255,255,255,0.98)")
                 .style("padding", "12px 16px")
                 .style("border-radius", "8px")
-                .style("box-shadow", "0 4px 12px rgba(0,0,0,0.15)")
+                .style("box-shadow", "0 4px 12px rgba(0,0,0,0.12)")
                 .style("border", "1px solid rgba(5,150,105,0.2)")
                 .style("font-size", "13px")
                 .style("pointer-events", "none")
@@ -101,20 +101,25 @@ function renderAct3() {
         const H = svg.node().clientHeight || 600;
 
         const simulation = d3.forceSimulation(nodes)
-            .force("link", d3.forceLink(links).id(d => d.id).distance(120))
-            .force("charge", d3.forceManyBody().strength(-300))
-            .force("center", d3.forceCenter(W / 2, H / 2))
-            .force("collide", d3.forceCollide().radius(d => Math.max(20, Math.sqrt(d.size) * 1.5)));
+            .force("link", d3.forceLink(links).id(d => d.id).distance(180))
+            .force("charge", d3.forceManyBody().strength(-800).distanceMax(600))
+            .force("x", d3.forceX(W / 2).strength(0.08))
+            .force("y", d3.forceY(H / 2).strength(0.08))
+            .force("collide", d3.forceCollide().radius(d => Math.max(25, Math.sqrt(d.size) * 2)));
 
         // 边粗细（根据共现次数）
         const maxCo = Math.max(...links.map(l => l.value), 1);
+
+        // 预计算每条线的彩色色值（仅悬停时使用）
+        function linkColoredStroke(d) {
+            const ratio = d.value / maxCo;
+            if (ratio > 0.6) return "rgba(225,29,72,0.6)";
+            if (ratio > 0.3) return "rgba(5,150,105,0.5)";
+            return "rgba(100,116,139,0.3)";
+        }
+
         const link = mainG.append("g").selectAll("line").data(links).join("line")
-            .attr("stroke", d => {
-                const ratio = d.value / maxCo;
-                if (ratio > 0.6) return "rgba(225,29,72,0.6)";  // 强共现：红色
-                if (ratio > 0.3) return "rgba(5,150,105,0.5)";  // 中共现：绿色
-                return "rgba(100,116,139,0.3)";                  // 弱共现：灰色
-            })
+            .attr("stroke", "rgba(100,116,139,0.2)")
             .attr("stroke-width", d => Math.max(1, Math.sqrt(d.value / maxCo) * 8));
 
         // 节点
@@ -147,19 +152,60 @@ function renderAct3() {
             .attr("dy", d => Math.max(15, Math.min(40, 10 + Math.sqrt(d.size / maxSize) * 30)) + 12)
             .attr("text-anchor", "middle")
             .text(d => `${d.size}件`)
-            .attr("fill", "#64748b")
+            .attr("fill", "#475569")
             .style("font-size", "8px")
             .style("pointer-events", "none");
 
+        // 选中状态跟踪
+        let selectedNode = null;
+        let selectedNodeEl = null;
+
+        function applyHighlight(d) {
+            link.each(function(l) {
+                const connected = (l.source.id || l.source) === d.id || (l.target.id || l.target) === d.id;
+                d3.select(this)
+                    .attr("stroke", connected ? linkColoredStroke(l) : "rgba(100,116,139,0.06)")
+                    .attr("stroke-opacity", connected ? 1 : 0.4);
+            });
+        }
+
+        function resetHighlight() {
+            link.attr("stroke", "rgba(100,116,139,0.2)").attr("stroke-opacity", 1);
+            node.selectAll("circle")
+                .attr("stroke", "#fff").attr("stroke-width", 1.5);
+        }
+
         // 交互事件
         node.on("click", function (event, d) {
+            // 点击同一节点则取消选中
+            if (selectedNode && selectedNode.id === d.id) {
+                selectedNode = null;
+                selectedNodeEl = null;
+                resetHighlight();
+                document.getElementById("techInsightContent").innerHTML = `
+                    <span style="color:var(--text-secondary);">点击网络中的任意节点查看技术详情...</span>
+                `;
+                return;
+            }
+
+            // 恢复之前选中节点的样式
+            if (selectedNodeEl) {
+                d3.select(selectedNodeEl).select("circle")
+                    .attr("stroke", "#fff").attr("stroke-width", 1.5);
+            }
+
+            selectedNode = d;
+            selectedNodeEl = this;
+            d3.select(this).select("circle")
+                .attr("stroke", "#1e293b").attr("stroke-width", 3);
+            applyHighlight(d);
+
             let linkedNodes = links.filter(l =>
                 (l.source.id || l.source) === d.id || (l.target.id || l.target) === d.id
             );
             let linkedCount = linkedNodes.length;
             let totalCo = linkedNodes.reduce((s, l) => s + l.value, 0);
 
-            // 拼装关联技术名称
             let linkedTechs = linkedNodes.map(l => {
                 const other = (l.source.id || l.source) === d.id ? (l.target.id || l.target) : (l.source.id || l.source);
                 return `${other}(${l.value})`;
@@ -171,7 +217,7 @@ function renderAct3() {
                     <strong>统计热度：</strong>本批数据包含 <span style='color:#d97706; font-weight:bold;'>${d.size}</span> 件资产<br/><br/>
                     <strong>技术衍生交集：</strong>与拓扑图中其他 <span style='color:#059669'>${linkedCount}</span> 个细分技术组存在深度跨界协同<br/>
                     <strong>共现强度总和：</strong>${totalCo}<br/><br/>
-                    <strong>Top 关联技术：</strong><span style='font-size:11px; color:#64748b;'>${linkedTechs || "无"}</span>
+                    <strong>Top 关联技术：</strong><span style='font-size:11px; color:#475569;'>${linkedTechs || "无"}</span>
                 </div>
             `;
         })
@@ -182,27 +228,37 @@ function renderAct3() {
 
             tooltip.style("display", "block")
                 .html(`
-                    <div style="font-weight:bold; color:#0f172a; margin-bottom:6px; font-size:13px;">${d.id}</div>
-                    <div style="color:#64748b; margin-bottom:3px;"><strong>专利数：</strong>${d.size} 件</div>
-                    <div style="color:#64748b;"><strong>关联技术：</strong>${linkedCount} 个</div>
-                    <div style="color:#94a3b8; font-size:11px; margin-top:4px;">${d.isCore ? "核心高频研发" : "边缘交叉创新"}</div>
+                    <div style="font-weight:bold; color:#1e293b; margin-bottom:6px; font-size:13px;">${d.id}</div>
+                    <div style="color:#475569; margin-bottom:3px;"><strong>专利数：</strong>${d.size} 件</div>
+                    <div style="color:#475569;"><strong>关联技术：</strong>${linkedCount} 个</div>
+                    <div style="color:#475569; font-size:11px; margin-top:4px;">${d.isCore ? "核心高频研发" : "边缘交叉创新"}</div>
                 `);
 
-            d3.select(this).select("circle")
-                .attr("stroke", "#0f172a").attr("stroke-width", 3);
-            link.attr("stroke-opacity", l =>
-                (l.source.id || l.source) === d.id || (l.target.id || l.target) === d.id ? 1 : 0.1
-            );
+            // 没有选中节点时才临时高亮
+            if (!selectedNode) {
+                d3.select(this).select("circle")
+                    .attr("stroke", "#1e293b").attr("stroke-width", 3);
+                applyHighlight(d);
+            }
         })
         .on("mousemove", function (event) {
             tooltip.style("left", (event.pageX + 15) + "px")
                 .style("top", (event.pageY - 10) + "px");
         })
-        .on("mouseout", function () {
+        .on("mouseout", function (event, d) {
             tooltip.style("display", "none");
-            d3.select(this).select("circle")
-                .attr("stroke", "#fff").attr("stroke-width", 1.5);
-            link.attr("stroke-opacity", 1);
+            // 没有选中节点时才重置
+            if (!selectedNode) {
+                d3.select(this).select("circle")
+                    .attr("stroke", "#fff").attr("stroke-width", 1.5);
+                link.attr("stroke", "rgba(100,116,139,0.2)").attr("stroke-opacity", 1);
+            } else if (selectedNode.id !== d.id) {
+                // 移出的不是选中节点，不干扰选中状态
+            } else {
+                // 移出选中节点，保持高亮
+                d3.select(this).select("circle")
+                    .attr("stroke", "#1e293b").attr("stroke-width", 3);
+            }
         });
 
         simulation.on("tick", () => {

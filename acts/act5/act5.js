@@ -96,7 +96,7 @@ function renderTierFunnel(TIERS, totalCount) {
         .attr('y', d => topPad + barAreaH - Math.max(6, sqrtScale(d)) - 6)
         .attr('text-anchor', 'middle')
         .attr('font-size', '12px').attr('font-weight', '600')
-        .attr('fill', '#334155')
+        .attr('fill', '#1e293b')
         .text(d => d.count.toLocaleString());
 
     // 等级标签（柱子下方，用深色保证可读性）
@@ -151,14 +151,14 @@ function renderRiskTimeline(RISK_ROWS, totalCount) {
     rows.append('text')
         .attr('x', labelW - 6).attr('y', rowH / 2 + 1)
         .attr('text-anchor', 'end').attr('dominant-baseline', 'middle')
-        .attr('font-size', '12px').attr('fill', '#64748b')
+        .attr('font-size', '12px').attr('fill', '#475569')
         .text(d => d.label);
 
     // 背景条
     rows.append('rect')
         .attr('x', labelW).attr('y', (rowH - 16) / 2)
         .attr('width', barAreaW).attr('height', 16)
-        .attr('fill', '#f1f5f9').attr('rx', 3);
+        .attr('fill', '#e2e8f0').attr('rx', 3);
 
     // 填充条（带动画）
     rows.append('rect')
@@ -180,7 +180,7 @@ function renderRiskTimeline(RISK_ROWS, totalCount) {
     rows.append('text')
         .attr('x', labelW + barAreaW + countW + 6).attr('y', rowH / 2 + 1)
         .attr('dominant-baseline', 'middle')
-        .attr('font-size', '10px').attr('fill', '#94a3b8')
+        .attr('font-size', '10px').attr('fill', '#475569')
         .text(d => {
             const p = totalCount > 0 ? (d.count / totalCount * 100).toFixed(1) : '0.0';
             return `${p}%`;

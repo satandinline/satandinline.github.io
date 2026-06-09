@@ -28,7 +28,7 @@ function renderLegalDonut() {
 
     const labels = Object.keys(globalProcessedMetrics.legalStatusStats);
     const values = Object.values(globalProcessedMetrics.legalStatusStats);
-    const colors = ['#22c55e', '#3b82f6', '#f43f5e', '#f59e0b'];
+    const colors = ['#059669', '#0284c7', '#b91c1c', '#d97706'];
     const hiddenSet = new Set();
     let hoveredIdx = -1;
 
@@ -98,7 +98,7 @@ function renderLegalDonut() {
             .merge(paths)
             .attr('d', d => (hoveredIdx === d.data.index && !hiddenSet.has(d.data.index)) ? arcHover(d) : arc(d))
             .attr('fill', d => hiddenSet.has(d.data.index) ? '#e2e8f0' : colors[d.data.index % colors.length])
-            .attr('stroke', '#ffffff').attr('stroke-width', 2)
+            .attr('stroke', '#f0f4f8').attr('stroke-width', 2)
             .style('cursor', 'pointer')
             .on('mouseover', function (event, d) {
                 if (hiddenSet.has(d.data.index)) return;
@@ -139,7 +139,7 @@ function renderLegalDonut() {
                 const vt = visTotal();
                 const p = vt > 0 ? (d.data.rawValue / vt) * 100 : 0;
                 if (p < 5) return '#334155';
-                return (bg === '#f59e0b') ? '#1e293b' : '#ffffff';
+                return '#ffffff';
             })
             .text(d => {
                 const vt = visTotal();
@@ -237,21 +237,23 @@ function renderTechPolarArea() {
     container.innerHTML = '';
 
     let sortedTech = Object.entries(globalProcessedMetrics.techThemeClustering)
-        .sort((a, b) => b[1] - a[1]).slice(0, 6);
+        .sort((a, b) => b[1] - a[1]).slice(0, 10);
     const rawTechVals = sortedTech.map(x => x[1]);
     const maxTechVal = Math.max(...rawTechVals);
     const displayTechVals = rawTechVals.map(v => Math.sqrt(v / maxTechVal) * maxTechVal);
 
     const bgColors = [
-        'rgba(200,151,60,0.55)', 'rgba(74,138,106,0.55)',
-        'rgba(58,90,138,0.55)', 'rgba(192,64,48,0.55)',
-        'rgba(138,125,101,0.55)', 'rgba(180,148,80,0.35)'
+        'rgba(2,132,199,0.60)', 'rgba(5,150,105,0.60)',
+        'rgba(217,119,6,0.60)', 'rgba(99,102,241,0.55)',
+        'rgba(225,29,72,0.50)', 'rgba(14,165,233,0.55)',
+        'rgba(168,85,247,0.50)', 'rgba(34,197,94,0.50)',
+        'rgba(244,63,94,0.45)', 'rgba(245,158,11,0.50)'
     ];
 
     // 逻辑坐标系
     const W = 400;
     const H = 240;
-    const legendW = 110;
+    const legendW = 130;
     const chartW = W - legendW;
     const radius = Math.min(chartW, H) / 2 - 16;
 
@@ -278,7 +280,7 @@ function renderTechPolarArea() {
     // 网格圈
     [0.25, 0.5, 0.75, 1].forEach(f => {
         g.append('circle').attr('r', radius * f)
-            .attr('fill', 'none').attr('stroke', 'rgba(180,148,80,0.1)');
+            .attr('fill', 'none').attr('stroke', 'rgba(100,116,139,0.12)');
     });
 
     // 扇区
@@ -291,7 +293,7 @@ function renderTechPolarArea() {
         g.append('path')
             .attr('d', arc.outerRadius(r).startAngle(startA).endAngle(endA)())
             .attr('fill', bgColors[i % bgColors.length])
-            .attr('stroke', '#2a2520').attr('stroke-width', 1)
+            .attr('stroke', '#f0f4f8').attr('stroke-width', 1)
             .style('cursor', 'pointer')
             .on('mouseover', function (event) {
                 d3.select(this).attr('fill-opacity', 0.8);
@@ -310,13 +312,13 @@ function renderTechPolarArea() {
     // 图例
     const legendG = svg.append('g').attr('transform', `translate(${chartW + 4}, ${H / 2 - sortedTech.length * 10})`);
     sortedTech.forEach((item, i) => {
-        const ly = i * 22;
+        const ly = i * 20;
         const lg = legendG.append('g').attr('transform', `translate(0, ${ly})`);
         lg.append('rect').attr('width', 12).attr('height', 12).attr('rx', 2)
             .attr('fill', bgColors[i % bgColors.length]);
         lg.append('text').attr('x', 16).attr('y', 10)
-            .attr('font-size', '10px').attr('fill', '#8a7d65')
-            .text(item[0].split('（')[0]);
+            .attr('font-size', '9px').attr('fill', '#475569')
+            .text(item[0]);
     });
 }
 
@@ -373,13 +375,13 @@ function renderCityBar() {
     // X 轴
     g.append('g').attr('transform', `translate(0, ${innerH})`)
         .call(d3.axisBottom(xScale).ticks(4).tickFormat(d3.format(',d')))
-        .selectAll('text').attr('fill', '#64748b').attr('font-size', '11px');
+        .selectAll('text').attr('fill', '#475569').attr('font-size', '11px');
     g.select('.domain').remove();
-    g.selectAll('.tick line').attr('stroke', 'rgba(148,163,184,0.15)');
+    g.selectAll('.tick line').attr('stroke', 'rgba(148,163,184,0.2)');
 
     // Y 轴
     g.append('g').call(d3.axisLeft(yScale).tickSize(0))
-        .selectAll('text').attr('fill', '#64748b').attr('font-size', '12px').attr('font-weight', '500');
+        .selectAll('text').attr('fill', '#475569').attr('font-size', '12px').attr('font-weight', '500');
     g.selectAll('.domain').remove();
 
     // 条形

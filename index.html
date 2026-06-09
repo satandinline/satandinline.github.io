@@ -15,7 +15,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
     <script src="https://cdn.kesci.com/lib/pyecharts_assets/maps/china.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap"
         rel="stylesheet">
 
     <!-- 引入全局样式 -->
@@ -71,7 +71,7 @@
                             </div>
                             <div class="prologue-block">
                                 <h3>我们怎么做？</h3>
-                                <p>整个项目基于 D3.js、ECharts 等前端可视化库搭建，参考了国内外专利可视化研究的成熟方法：用热力地图看地域分布，用网络图看技术融合和竞争关系，用桑基图看技术演进。每个图表都支持交互操作，可以悬停查看详情、点击深入探索。</p>
+                                <p>整个项目基于 D3.js、ECharts 等前端可视化库搭建，用热力地图看地域分布，用网络图看技术融合和竞争关系，用桑基图看技术演进。每个图表都支持交互操作，可以悬停查看详情、点击深入探索。</p>
                             </div>
                             <div class="prologue-block">
                                 <h3>做了有什么意义？</h3>
@@ -79,7 +79,7 @@
                             </div>
                             <div class="prologue-block">
                                 <h3>你将看到什么？</h3>
-                                <p>接下来六个篇章，将带你走完这段专利数据之旅：先看全局快照，再看地域分布，接着探索技术融合、竞争格局、价值分层，最后追踪技术演进的时间脉络。准备好了吗？</p>
+                                <p>接下来六个篇章，将带你走完这段专利数据之旅：先看全局快照，再看地域分布，接着探索技术融合、竞争格局、价值分层，最后追踪技术演进的时间脉络。</p>
                             </div>
                         </div>
                     </div>
@@ -135,14 +135,14 @@
                         <span class="ds-card-num">01</span>
                         <h3>数据来源：智慧牙专利数据库</h3>
                     </div>
-                    <p>智慧牙（PatSnap）是全球领先的专利检索与分析平台，覆盖 150 多个国家和地区的专利数据。我们以“人型机器人”为关键词在上面做检索，把相关专利申请全部拉下来作为原始数据。</p>
+                    <p>智慧牙（PatSnap）是全球领先的专利检索与分析平台，覆盖全球大多数国家和地区的专利数据。以“人型机器人”为关键词进行检索，经去重后相关专利信息作为原始数据。</p>
                 </div>
                 <div class="ds-card" id="dsCard-filter">
                     <div class="ds-card-head">
                         <span class="ds-card-num">02</span>
                         <h3>筛选条件与清洗规则</h3>
                     </div>
-                    <p>检索词锁定“人型机器人”，专利类型只保留发明和实用新型，外观设计剔除掉。导出的原始数据还要经过字段补全、去重、省份名称标准化等清洗步骤，才能得到规范可用的核心数据集。</p>
+                    <p>检索词锁定“人型机器人”，导出的原始数据经过字段补全、去重、省份名称标准化等清洗步骤，得到规范可用的核心数据集。</p>
                 </div>
                 <div class="ds-card ds-card-highlight" id="dsCard-patent">
                     <div class="ds-card-head">
@@ -191,12 +191,12 @@
                 <p class="scene-subtitle">创新的基本盘，藏在专利的法律结构与总量分布中</p>
             </div>
             <div class="act-intro">
-                这不是简单的数字堆砌。每一件专利背后，都是一次对"让机器更像人"这个命题的回答。审查、授权、驳回与放弃，构成了技术演进的自然筛选机制。法律状态、技术分布、城市集聚与高价值资产，共同构成这份全景的四个切面。
+                每一件专利背后，都是一次对"让机器更像人"这个命题的回答。审查、授权、驳回与放弃，构成了技术演进的自然筛选机制。法律状态、技术分布、城市集聚与高价值资产，共同构成这份全景的四个切面。
             </div>
             <div class="story-text">
                 <p>专利审查结构是一个鲜明的<span class="story-highlight">金字塔</span>：仅 <span class="story-data">38.9%</span> 拿到授权，超过半数（<span class="story-data">52.1%</span>）还在排队等待审查，<span class="story-data">8.8%</span> 被驳回或撤回，仅 <span class="story-data">0.1%</span> 已经失效。这个领域超过一半的创新，仍在接受市场与法律的双重检验——竞争激烈程度不言而喻。</p>
                 <p>高价值专利有 <span class="story-data">2,866 件</span>，它们是企业真正的“家底”，也是产业未来的战略筹码。技术主题方面，程序控制、机械手、机械接头这些老本行依然是主力，但智能控制、视觉感知这些新面孔正在加速涌入。老本行加新面孔，机器人产业正在从单一功能向综合智能方向演进。</p>
-                <p>打开地理版图，深圳以 <span class="story-data">1,110 件</span>专利拿下榜首，上海以 <span class="story-data">1,070 件</span>紧追其后，北京、广州、杭州分列三至五位。五城合计占据全国三分之二以上——创新资源向头部城市集中的趋势，已经不可逆转。</p>
+                <p>深圳以 <span class="story-data">1,110 件</span>专利拿下榜首，上海以 <span class="story-data">1,070 件</span>紧追其后，北京、广州、杭州分列三至五位。五城合计占据全国三分之二以上——创新资源向头部城市集中的趋势，已经不可逆转。</p>
                 <div class="story-summary"><strong>小结：</strong>深圳、上海、北京三城引领，高价值专利占比近四成，技术体系正从机械主导向智能主导转型。</div>
             </div>
             <div class="hub-spoke-grid">
@@ -246,7 +246,7 @@
                 <p class="scene-subtitle">创新落在哪里，产业就生长在哪里</p>
             </div>
             <div class="act-intro">
-                专利不是均匀撒落的。它跟着高校、制造链和政策洼地走。广东、上海、北京三地合计占据超过半数份额——这不是巧合，而是产业土壤与科研资源共同筛选的结果。
+                专利不是均匀撒落的。它跟着高校、制造链和政策洼地走。广东、上海、北京三地合计占据超过半数份额——这是产业土壤与科研资源共同筛选的结果。
             </div>
             <div class="story-text">
                 <p><span class="story-highlight">珠三角、长三角、京津冀</span>三大城市群是中国机器人创新的主战场。广东省以 <span class="story-data">1,697 件</span>专利一骑绝尘，上海紧随其后，北京位列第三。这些地区制造业根基深厚，高校和科研院所密集，“产学研用”早已深度融合在一起。</p>
@@ -254,7 +254,7 @@
             </div>
             <div class="dashboard-card">
                 <h3>全国省份专利密度热力图 (鼠标悬停查看省份详情)</h3>
-                <div id="echartsChinaMap" style="width: 100%; height: 720px;"></div>
+                <div id="echartsChinaMap" style="width: 100%; height: 85vh;"></div>
             </div>
         </div>
 
@@ -467,7 +467,7 @@
             </div>
             <div class="dashboard-card act6-card">
                 <h3>技术演进桑基图（年份区间 → 研究主题 → IPC 赛道）</h3>
-                <div id="act6SankeyContainer" style="width:100%; height:620px; position:relative;">
+                <div id="act6SankeyContainer" style="width:100%; height:700px; position:relative;">
                     <svg id="act6SankeySvg" width="100%" height="100%"></svg>
                 </div>
             </div>

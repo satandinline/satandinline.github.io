@@ -180,6 +180,20 @@ function executeCoreDataPipeline() {
             }
         }
 
+        // 用 type.csv 的技术分类标注覆盖 IPC 推断的 techThemeClustering
+        if (rawTypeCsvData && rawTypeCsvData.length > 0) {
+            const techCols = Object.keys(rawTypeCsvData[0]).filter(k => k !== 'id' && k !== 'publication_no');
+            const typeCounts = {};
+            techCols.forEach(col => { typeCounts[col] = 0; });
+            rawTypeCsvData.forEach(row => {
+                techCols.forEach(col => {
+                    if (parseInt(row[col]) === 1) typeCounts[col]++;
+                });
+            });
+            globalProcessedMetrics.techThemeClustering = typeCounts;
+            console.log('已用 type.csv 覆盖技术主题聚类，分类数：', techCols.length);
+        }
+
         // 隐藏加载提示
         document.getElementById('globalLoadingNotice').style.display = 'none';
 
@@ -195,6 +209,8 @@ function executeCoreDataPipeline() {
 
         // 初始化滚动监听，高亮当前幕的标签
         initScrollSpy();
+        // 初始化导航栏交互隐藏
+        initNavbarAutoHide();
     } catch (err) {
         console.error(err);
         alert("执行矩阵解析时发生内部错误: " + err.message);
