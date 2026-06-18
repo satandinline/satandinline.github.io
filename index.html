@@ -4,54 +4,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>机器人专利创新全景智能化分析大屏</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>机器人专利创新全景化分析</title>
 
     <!-- 引入第三方库 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
     <script src="https://cdn.kesci.com/lib/pyecharts_assets/maps/china.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;500;600;700&display=swap"
         rel="stylesheet">
 
     <!-- 引入全局样式 -->
-    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/global.css?v=2">
 
     <!-- 引入各幕专属样式 (初始隐藏，通过JS控制显示) -->
-    <link rel="stylesheet" href="acts/act1/act1.css">
-    <link rel="stylesheet" href="acts/act2/act2.css">
-    <link rel="stylesheet" href="acts/act3/act3.css">
-    <link rel="stylesheet" href="acts/act4/act4.css">
-    <link rel="stylesheet" href="acts/act5/act5.css">
+    <link rel="stylesheet" href="acts/act1/act1.css?v=2">
+    <link rel="stylesheet" href="acts/act2/act2.css?v=2">
+    <link rel="stylesheet" href="acts/act3/act3.css?v=2">
+    <link rel="stylesheet" href="acts/act4/act4.css?v=2">
+    <link rel="stylesheet" href="acts/act5/act5.css?v=2">
+    <link rel="stylesheet" href="acts/act6/act6.css?v=2">
 </head>
 
 <body>
-    <div id="globalLoadingNotice">正在深度洗标、解算多维共现矩阵与风险特征，请稍候...</div>
+    <div id="globalLoadingNotice"></div>
 
     <!-- 顶部导航栏 -->
     <div class="top-navbar">
         <div>
-            <h1>机器人专利创新全景智能化分析大屏</h1>
+            <h1>机器人专利创新全景化分析</h1>
         </div>
     </div>
 
     <!-- 标签切换栏 -->
     <div class="narrative-tabs">
-        <button class="tab-btn active" onclick="switchNarrativeAct(1)">一、全景仪表盘</button>
-        <button class="tab-btn" onclick="switchNarrativeAct(2)">二、区域空间格局</button>
-        <button class="tab-btn" onclick="switchNarrativeAct(3)">三、技术融合拓扑</button>
-        <button class="tab-btn" onclick="switchNarrativeAct(4)">四、主体竞争网络</button>
-        <button class="tab-btn" onclick="switchNarrativeAct(5)">五、价值预警矩阵</button>
+        <button class="tab-btn active" data-section="narrativeAct0" onclick="switchNarrativeAct(0)">引入</button>
+        <button class="tab-btn" data-section="narrativeActDS" onclick="switchNarrativeAct('DS')">数据溯源</button>
+        <button class="tab-btn" data-section="narrativeAct1" onclick="switchNarrativeAct(1)">一、全景仪表盘</button>
+        <button class="tab-btn" data-section="narrativeAct2" onclick="switchNarrativeAct(2)">二、区域空间格局</button>
+        <button class="tab-btn" data-section="narrativeAct3" onclick="switchNarrativeAct(3)">三、技术融合拓扑</button>
+        <button class="tab-btn" data-section="narrativeAct4" onclick="switchNarrativeAct(4)">四、主体竞争网络</button>
+        <button class="tab-btn" data-section="narrativeAct5" onclick="switchNarrativeAct(5)">五、价值预警矩阵</button>
+        <button class="tab-btn" data-section="narrativeAct6" onclick="switchNarrativeAct(6)">六、技术演进脉络</button>
     </div>
 
-    <!-- 主内容区：动态加载各幕 HTML -->
-    <div id="mainDashboardView" class="main-content" style="display: none;">
-        <div id="narrativeAct1" class="narrative-section active">
-            <!-- Act 1 内容将通过 fetch 或静态包含加载，此处先保留占位，实际开发中建议用 JS 动态插入或后端模板 -->
-            <!-- 为了简化单文件运行，我们在这里直接包含结构，但逻辑已拆分 -->
+    <!-- 主内容区 -->
+    <div id="mainDashboardView" class="main-content">
+        <!-- 引入/序幕 -->
+        <div id="narrativeAct0" class="narrative-section active">
+            <div class="prologue-wrapper">
+                <div class="prologue-section">
+                    <div class="prologue-glass">
+                        <div class="scene-header">
+                            <span class="scene-num">PROLOGUE</span>
+                            <h2 class="prologue-title">机器人专利创新全景：从机械臂到具身智能的进化之路</h2>
+                            <p class="prologue-subtitle">7,364 件专利，拼出中国人形机器人创新的全貌</p>
+                        </div>
+                        <div class="prologue-grid">
+                            <div class="prologue-block">
+                                <h3>为什么做这个项目？</h3>
+                                <p>专利数据本来就藏着很多故事——谁在申请、在哪里创新、哪些技术最热、哪些专利最值钱。但原始数据字段多、体量大，光看表格根本看不出规律。我们想做的，就是把这些沉睡在表格里的信息“叫醒”，用可视化的方式让它们自己说话。</p>
+                            </div>
+                            <div class="prologue-block">
+                                <h3>我们怎么做？</h3>
+                                <p>整个项目基于 D3.js、ECharts 等前端可视化库搭建，用热力地图看地域分布，用网络图看技术融合和竞争关系，用桑基图看技术演进。每个图表都支持交互操作，可以悬停查看详情、点击深入探索。</p>
+                            </div>
+                            <div class="prologue-block">
+                                <h3>做了有什么意义？</h3>
+                                <p>跳出传统的表格和文字报告，让专利数据变得可看、可玩、可理解。无论是想了解哪个省份创新最强、哪个技术赛道最热，还是哪些专利最有价值，都能在这里找到直观的答案。</p>
+                            </div>
+                            <div class="prologue-block">
+                                <h3>你将看到什么？</h3>
+                                <p>接下来六个篇章，将带你走完这段专利数据之旅：先看全局快照，再看地域分布，接着探索技术融合、竞争格局、价值分层，最后追踪技术演进的时间脉络。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 数据溯源 -->
+        <div id="narrativeActDS" class="narrative-section">
+            <div class="scene-header">
+                <span class="scene-num">DATA SOURCE</span>
+                <h2 class="scene-title">数据溯源</h2>
+                <p class="scene-subtitle">这不是一套单一来源的数据。我们以智慧芽专利数据库为起点，经过多轮筛选与加工，将原始专利记录变成了可以看得见、摸得着的可视化数据集。</p>
+            </div>
+
+            <!-- 数据旅程流程图 -->
+            <div class="data-journey-flow">
+                <div class="dj-step" onclick="toggleDSCard('src')">
+                    <div class="dj-num">01</div>
+                    <div class="dj-label">数据采集</div>
+                    <div class="dj-sub">智慧芽专利库</div>
+                </div>
+                <div class="dj-arrow">→</div>
+                <div class="dj-step" onclick="toggleDSCard('filter')">
+                    <div class="dj-num">02</div>
+                    <div class="dj-label">条件筛选</div>
+                    <div class="dj-sub">人形机器人领域</div>
+                </div>
+                <div class="dj-arrow">→</div>
+                <div class="dj-step dj-active" onclick="toggleDSCard('patent')">
+                    <div class="dj-num">03</div>
+                    <div class="dj-label">核心数据集</div>
+                    <div class="dj-sub">patent.csv</div>
+                </div>
+                <div class="dj-arrow">→</div>
+                <div class="dj-step" onclick="toggleDSCard('derive')">
+                    <div class="dj-num">04</div>
+                    <div class="dj-label">派生加工</div>
+                    <div class="dj-sub">4 份分析表</div>
+                </div>
+                <div class="dj-arrow">→</div>
+                <div class="dj-step dj-end" onclick="switchNarrativeAct(1)">
+                    <div class="dj-num">05</div>
+                    <div class="dj-label">可视化输出</div>
+                    <div class="dj-sub">六幕分析大屏</div>
+                </div>
+            </div>
+
+            <!-- 详细卡片 -->
+            <div class="ds-cards-grid">
+                <div class="ds-card" id="dsCard-src">
+                    <div class="ds-card-head">
+                        <span class="ds-card-num">01</span>
+                        <h3>数据来源：智慧芽专利数据库</h3>
+                    </div>
+                    <p>智慧芽（PatSnap）是全球领先的专利检索与分析平台，覆盖全球大多数国家和地区的专利数据。以“人形机器人”为关键词检索2026年5月12日及之前的数据，经patsnap同族筛选（每族patsnap同族一个专利代表）、去重后相关专利信息作为原始数据。</p>
+                </div>
+                <div class="ds-card" id="dsCard-filter">
+                    <div class="ds-card-head">
+                        <span class="ds-card-num">02</span>
+                        <h3>筛选条件与清洗规则</h3>
+                    </div>
+                    <p>检索词锁定“人形机器人”，导出的原始数据经过字段补全、去重、省份名称标准化等清洗步骤，得到规范可用的核心数据集。</p>
+                </div>
+                <div class="ds-card ds-card-highlight" id="dsCard-patent">
+                    <div class="ds-card-head">
+                        <span class="ds-card-num">03</span>
+                        <h3>核心数据集：patent.csv</h3>
+                    </div>
+                    <p>清洗后的主数据集，包含专利名称、申请人、申请日期、法律状态、IPC 分类号、省份等关键字段。后面六幕分析全部基于这份数据展开——它是整个大屏的数据基石。</p>
+                </div>
+                <div class="ds-card" id="dsCard-derive">
+                    <div class="ds-card-head">
+                        <span class="ds-card-num">04</span>
+                        <h3>派生数据表</h3>
+                    </div>
+                    <div class="ds-derive-list">
+                        <div class="ds-derive-item">
+                            <span class="ds-file">patent_base.csv</span>
+                            <span class="ds-desc">基础信息精简表，用于第一幕全景统计</span>
+                        </div>
+                        <div class="ds-derive-item">
+                            <span class="ds-file">patent_explode.csv</span>
+                            <span class="ds-desc">IPC 分类号拆解表，每条 IPC 独立一行，支撑第三幕技术共现分析</span>
+                        </div>
+                        <div class="ds-derive-item">
+                            <span class="ds-file">applicant_focus.csv</span>
+                            <span class="ds-desc">头部申请人聚焦表，提取 Top 申请人及其技术布局，服务第四幕竞争网络</span>
+                        </div>
+                        <div class="ds-derive-item">
+                            <span class="ds-file">type.csv</span>
+                            <span class="ds-desc">技术分类汇总表，按 IPC 大类聚合统计，用于第六幕演进脉络分析</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据处理说明 -->
+            <div class="ds-processing-note">
+                <h3>数据处理说明</h3>
+                <p>所有数据均来源于智慧芽专利数据库的检索导出，筛选条件为“人形机器人”相关发明与实用新型专利。原始数据经过去重、字段标准化、省份映射等清洗步骤后得到 patent.csv。派生表格均由 patent.csv 通过 Python 脚本加工生成，其中 IPC 分类号拆解采用一对多展开，省份统计剔除了“未知”及境外记录。前端可视化采用 D3.js、ECharts 等库实现交互呈现。</p>
+            </div>
+        </div>
+
+        <div id="narrativeAct1" class="narrative-section">
+            <div class="scene-header">
+                <span class="scene-num">SCENE 01</span>
+                <h2 class="scene-title">全景快照</h2>
+                <p class="scene-subtitle">创新的基本盘，藏在专利的法律结构与总量分布中</p>
+            </div>
+            <div class="act-intro">
+                每一件专利背后，都是一次对<strong>“让机器更像人”</strong>这个命题的回答。审查、授权、驳回与放弃，构成了技术演进的<strong>自然筛选机制</strong>。法律状态、技术分布、城市集聚与高价值资产，共同构成这份全景的<strong>四个切面</strong>。
+            </div>
+            <div class="story-text">
+                <p>专利审查结构是一个鲜明的<span class="story-highlight">金字塔</span>：仅 <span class="story-data">38.9%</span> 拿到授权，超过半数（<span class="story-data">52.1%</span>）还在排队等待审查，<span class="story-data">8.8%</span> 被驳回或撤回，仅 <span class="story-data">0.1%</span> 已经失效。这个领域超过一半的创新，仍在接受市场与法律的双重检验——竞争激烈程度不言而喻。</p>
+                <p>高价值专利有 <span class="story-data">2,866 件</span>，它们是企业真正的“家底”，也是产业未来的战略筹码。技术主题方面，程序控制、机械手、机械接头这些老本行依然是主力，但智能控制、视觉感知这些新面孔正在加速涌入。老本行加新面孔，机器人产业正在从单一功能向综合智能方向演进。</p>
+                <p>深圳以 <span class="story-data">1,110 件</span>专利拿下榜首，上海以 <span class="story-data">1,070 件</span>紧追其后，北京、广州、杭州分列三至五位。五城合计占据全国三分之二以上——创新资源向头部城市集中的趋势，已经不可逆转。</p>
+                <div class="story-summary"><strong>小结：</strong>深圳、上海、北京三城引领，高价值专利占比近四成，技术体系正从机械主导向智能主导转型。</div>
+            </div>
             <div class="hub-spoke-grid">
                 <div class="hub-central-core">
                     <span style="color: var(--text-secondary); font-size: 12px;">清洗后有效专利</span>
@@ -62,7 +209,7 @@
                 </div>
                 <div class="dashboard-card" style="grid-column: 1; grid-row: 1;">
                     <h3>专利法律审查结构</h3>
-                    <div class="canvas-wrapper"><canvas id="chartAct1GrantRate"></canvas></div>
+                    <div class="canvas-wrapper" id="chartAct1GrantRate"></div>
                 </div>
                 <div class="dashboard-card" style="grid-column: 1; grid-row: 2;">
                     <h3>高价值专利资产池</h3>
@@ -73,76 +220,268 @@
                             <div id="metricHighValueRatio" style="font-size:12px; color:var(--text-secondary);">占比 --%
                             </div>
                         </div>
-                        <div style="width: 120px; height: 120px;"><canvas id="chartAct1HighValueArc"></canvas></div>
+                        <div id="chartAct1HighValueArc" style="width:120px;height:120px;"></div>
                     </div>
                 </div>
                 <div class="dashboard-card" style="grid-column: 3; grid-row: 1;">
-                    <h3>技术分支主题分布 (Top 6)</h3>
-                    <div class="canvas-wrapper"><canvas id="chartAct1TechRose"></canvas></div>
+                    <h3>技术主题分布（Top 10）</h3>
+                    <div class="canvas-wrapper" id="chartAct1TechRose"></div>
                 </div>
                 <div class="dashboard-card" style="grid-column: 3; grid-row: 2;">
                     <h3 style="color: var(--cyan-accent);">创新地市排行 TOP 5</h3>
-                    <div class="canvas-wrapper"><canvas id="chartAct1CityBar"></canvas></div>
+                    <div class="canvas-wrapper" id="chartAct1CityBar"></div>
                 </div>
             </div>
         </div>
 
+        <div class="act-transition">
+            <p>知道了总量与结构之后，下一个问题自然是：这些创新，落在了哪里？</p>
+            <span class="trans-arrow">↓</span>
+        </div>
+
         <div id="narrativeAct2" class="narrative-section">
+            <div class="scene-header">
+                <span class="scene-num">SCENE 02</span>
+                <h2 class="scene-title">空间集聚</h2>
+                <p class="scene-subtitle">创新落在哪里，产业就生长在哪里</p>
+            </div>
+            <div class="act-intro">
+                专利不是均匀撒落的。它<strong>跟着高校、制造链和政策洼地走</strong>。广东、上海、北京三地合计占据<strong>超过半数份额</strong>——这是产业土壤与科研资源共同筛选的结果。
+            </div>
+            <div class="story-text">
+                <p><span class="story-highlight">珠三角、长三角、京津冀</span>三大城市群是中国机器人创新的主战场。广东省以 <span class="story-data">1,697 件</span>专利一骑绝尘，上海紧随其后，北京位列第三。这些地区制造业根基深厚，高校和科研院所密集，“产学研用”早已深度融合在一起。</p>
+                <div class="story-summary"><strong>小结：</strong>三大城市群各有所长，区域间的技术互补与协同，正在成为中国机器人产业往前走的重要推力。</div>
+            </div>
             <div class="dashboard-card">
                 <h3>全国省份专利密度热力图 (鼠标悬停查看省份详情)</h3>
-                <div id="echartsChinaMap" style="width: 100%; height: 550px;"></div>
+                <div id="echartsChinaMap" style="width: 100%; height: 85vh;"></div>
             </div>
         </div>
 
+        <div class="act-transition">
+            <p>地理格局已清晰，但创新不只是地域问题——技术本身也在发生融合。</p>
+            <span class="trans-arrow">↓</span>
+        </div>
+
         <div id="narrativeAct3" class="narrative-section">
+            <div class="scene-header">
+                <span class="scene-num">SCENE 03</span>
+                <h2 class="scene-title">技术共现</h2>
+                <p class="scene-subtitle">IPC 分类号的共现关系，正是技术融合走向的「地下管线」</p>
+            </div>
+            <div class="act-intro">
+                当一件专利同时涉及“机械手”和“控制系统”，就意味着这两个领域正在发生真实的耦合。共现越密集，<strong>技术边界越模糊</strong>——这正是<strong>跨赛道创新</strong>的底层信号。
+            </div>
+            <div class="story-text">
+                <p>技术融合正在织成一张越来越密的<span class="story-highlight">网</span>。运动执行、结构仿生、智能控制三大领域各自快速生长，它们之间的连线也越来越多——技术边界在模糊，跨界创新的机会窗口正在打开。对后来者来说，这正是弯道超车的最好时机。</p>
+                <div class="story-summary"><strong>小结：</strong>运动执行、结构仿生和智能控制三大领域正在深度融合，技术边界的模糊化为后发企业打开了新的机会窗口。</div>
+            </div>
             <div class="split-network-container">
                 <div class="network-svg-container">
                     <svg id="act3TechNetworkSvg" width="100%" height="100%"></svg>
                 </div>
                 <div class="insight-panel">
-                    <h3 style="margin:0; font-size:16px; color:var(--cyan-accent);">💡 技术共现拓扑面板</h3>
+                    <h3 style="margin:0; font-size:16px; color:var(--emerald-accent);">技术共现拓扑</h3>
                     <p style="font-size:12px; color:var(--text-secondary); margin:0; line-height:1.6;">
-                        <strong>业务图景现实逻辑：</strong>同一件专利如果包含多项交叉IPC分类号，即自动产生科学共现联结。线越粗意味着这些领域经常进行**联合研发跨界突破**。<br /><br />
-                        🔵 蓝色线：边缘交叉创新探索<br />
-                        🔴 红色粗线：核心高频绑定研发带
+                        单件专利涉及多个 IPC 分类时，产生共现连边，线越粗代表联合出现越频繁。<br /><br />
+                        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#0284c7;margin-right:4px;vertical-align:middle;"></span> 蓝色：边缘交叉创新<br />
+                        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#d97706;margin-right:4px;vertical-align:middle;"></span> 橙色：核心高频研发
                     </p>
                     <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:5px 0;" />
                     <div id="techInsightContent" style="font-size:13px; color:var(--text-primary);">
-                        <span style="color:var(--text-secondary);">点击网络中的任意技术球查看数据洞察...</span>
+                        <span style="color:var(--text-secondary);">点击网络中的任意节点查看技术详情...</span>
                     </div>
                 </div>
             </div>
         </div>
 
+        <div class="act-transition">
+            <p>技术在融合，那推动这些技术的人呢？</p>
+            <span class="trans-arrow">↓</span>
+        </div>
+
         <div id="narrativeAct4" class="narrative-section">
+            <div class="scene-header">
+                <span class="scene-num">SCENE 04</span>
+                <h2 class="scene-title">主体博弈</h2>
+                <p class="scene-subtitle">高校守住基础研究，企业收拢应用集成</p>
+            </div>
+            <div class="act-intro">
+                头部申请机构的<strong>竞争格局已相对固化</strong>，但结构性变化仍在发生。高校系在传感与算法领域持续发力，产业系则在运动控制与整机集成方向快速收拢。同一 IPC 细分领域的<strong>重叠布局</strong>，构成了最直接的竞争关系。
+            </div>
+            <div class="story-text">
+                <p>把镜头从技术转向人——申请人协作网络映射出产业竞争的真实<span class="story-highlight">生态</span>。头部企业在核心领域的专利布局高度重叠，竞争针尖对麦芒；另一面，产学研合作却在加速打通，高校与企业之间的技术转移越来越频繁。竞争与合作并存，这才是当下产业生态的全貌。</p>
+                <div class="story-summary"><strong>小结：</strong>“高校做基础研究 + 企业做应用转化”的双轨模式已经成型。头部企业优势稳固，新兴力量也在通过差异化创新快速崛起。</div>
+            </div>
             <div class="split-network-container">
                 <div class="network-svg-container">
                     <svg id="act4AssigneeNetworkSvg" width="100%" height="100%"></svg>
                 </div>
                 <div class="insight-panel">
-                    <h3 style="margin:0; font-size:16px; color:var(--emerald-accent);">⚔️ 竞争主体格局面板</h3>
+                    <h3 style="margin:0; font-size:16px; color:var(--emerald-accent);">申请人协作网络</h3>
                     <p style="font-size:12px; color:var(--text-secondary); margin:0; line-height:1.6;">
-                        <strong>业务图景现实逻辑：</strong>如果两个企业或高校在同一细分机器人核心技术分支中密集申请专利，意味着强烈的**正面市场对决与研发对抗**。节点越大实力越雄厚。<br /><br />
-                        🟢 绿色细线：技术板块存在重叠<br />
-                        🔥 橙色粗线：白热化主战场对攻！
+                        两个申请人在相同 IPC 子分类下均有专利，即产生连边。共现越多，技术赛道重叠度越高。<br /><br />
+                        <span style="display:inline-block;width:14px;height:2px;background:rgba(5,150,105,0.5);margin-right:4px;vertical-align:middle;"></span> 细线：轻度重叠<br />
+                        <span style="display:inline-block;width:14px;height:4px;background:rgba(225,29,72,0.7);margin-right:4px;vertical-align:middle;"></span> 粗线：高强度竞争
                     </p>
                     <hr style="border:0; border-top:1px solid rgba(255,255,255,0.05); margin:5px 0;" />
                     <div id="assigneeInsightContent" style="font-size:13px; color:var(--text-primary);">
-                        <span style="color:var(--text-secondary);">点击网络中的主体节点查看竞争宿敌分析...</span>
+                        <span style="color:var(--text-secondary);">点击网络中的任意节点查看申请人详情...</span>
                     </div>
                 </div>
             </div>
         </div>
 
+        <div class="act-transition">
+            <p>竞争的格局已定，但并非所有专利都值得长期持有。</p>
+            <span class="trans-arrow">↓</span>
+        </div>
+
         <div id="narrativeAct5" class="narrative-section">
-            <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 25px;">
-                <div class="dashboard-card" style="height: 450px;">
-                    <h3>高价值专利多指标核心挖掘矩阵</h3>
-                    <div class="canvas-wrapper"><canvas id="chartAct5ValueFeature"></canvas></div>
+            <div class="scene-header">
+                <span class="scene-num">SCENE 05</span>
+                <h2 class="scene-title">价值分层</h2>
+                <p class="scene-subtitle">不是所有专利都值得长期持有</p>
+            </div>
+            <div class="act-intro">
+                授权状态、被引次数、同族数量与技术活跃度，四项指标加权合成<strong>百分制评分</strong>。得分高低决定了资产的运营策略——是重点维护、许可变现，还是评估放弃。<strong>金字塔尖的 S 级资产</strong>，往往只占个位数比例。
+            </div>
+            <div class="story-text">
+                <p>专利价值怎么评？四个指标加权打分：授权状态占 <span class="story-data">35 分</span>，被引次数占 <span class="story-data">30 分</span>，同族数量占 <span class="story-data">20 分</span>，技术活跃度占 <span class="story-data">15 分</span>。这套评分体系综合考虑了法律确权、学术影响力、国际布局和市场前景，能较为客观地评估每件专利的综合价值。</p>
+                <div class="story-summary"><strong>小结：</strong>价值分层管理帮企业把有限的资源用在刀刃上——该维护的重点维护，该变现的及时变现，该放弃的果断放弃。</div>
+            </div>
+
+            <div class="act5-layout">
+                <!-- 评分指标说明行 -->
+                <div class="act5-scoring-row">
+                    <div class="score-indicator tier-s">
+                        <span class="si-label">授权状态</span>
+                        <span class="si-name">法律确权质量</span>
+                        <span class="si-range">授权 +35 · 审查中 +15 · 失效 0</span>
+                        <div class="si-bar" style="background:var(--tc); width:100%;"></div>
+                    </div>
+                    <div class="score-indicator tier-a">
+                        <span class="si-label">被引次数</span>
+                        <span class="si-name">学术与产业引用</span>
+                        <span class="si-range">每次引用 +3分，上限 30 分</span>
+                        <div class="si-bar" style="background:var(--tc); width:85%;"></div>
+                    </div>
+                    <div class="score-indicator tier-b">
+                        <span class="si-label">同族数量</span>
+                        <span class="si-name">国际布局广度</span>
+                        <span class="si-range">每件同族 +4分，上限 20 分</span>
+                        <div class="si-bar" style="background:var(--tc); width:57%;"></div>
+                    </div>
+                    <div class="score-indicator tier-c">
+                        <span class="si-label">技术活跃度</span>
+                        <span class="si-name">IPC 分类热度</span>
+                        <span class="si-range">高热赛道 +15 · 中热 +8 · 冷门 +2</span>
+                        <div class="si-bar" style="background:var(--tc); width:43%;"></div>
+                    </div>
                 </div>
-                <div class="dashboard-card" style="height: 450px;">
-                    <h3>资产运营风险监控与生命周期预警</h3>
-                    <div class="canvas-wrapper"><canvas id="chartAct5RiskMonitor"></canvas></div>
+
+                <!-- 五级资产分布概览 -->
+                <div class="dashboard-card act5-card">
+                    <h3>五级资产分布概览</h3>
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <div class="tier-funnel" id="tierFunnel"></div>
+                        <div id="tierDetailBox" class="tier-detail-box">
+                            点击上方各级色块查看该级说明
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 单件专利评分模拟 -->
+                <div class="score-calculator">
+                    <h3>单件专利评分模拟</h3>
+                    <div class="calc-row">
+                        <div class="calc-row-head">
+                            <span class="cr-name">授权状态</span>
+                            <span><span class="cr-score" id="s1val">35</span> <span class="cr-max">/ 35</span></span>
+                        </div>
+                        <input class="calc-slider" type="range" min="0" max="35" value="35" step="5" id="s1" oninput="updateAct5Calc()">
+                        <div class="calc-slider-labels">
+                            <span>失效 (0)</span><span>审查中 (15)</span><span>已授权 (35)</span>
+                        </div>
+                    </div>
+                    <div class="calc-row">
+                        <div class="calc-row-head">
+                            <span class="cr-name">被引次数</span>
+                            <span><span class="cr-score" id="s2val">0</span> <span class="cr-max">/ 30</span></span>
+                        </div>
+                        <input class="calc-slider" type="range" min="0" max="30" value="0" id="s2" oninput="updateAct5Calc()">
+                    </div>
+                    <div class="calc-row">
+                        <div class="calc-row-head">
+                            <span class="cr-name">同族数量</span>
+                            <span><span class="cr-score" id="s3val">0</span> <span class="cr-max">/ 20</span></span>
+                        </div>
+                        <input class="calc-slider" type="range" min="0" max="20" value="0" id="s3" oninput="updateAct5Calc()">
+                    </div>
+                    <div class="calc-row">
+                        <div class="calc-row-head">
+                            <span class="cr-name">技术活跃度</span>
+                            <span><span class="cr-score" id="s4val">8</span> <span class="cr-max">/ 15</span></span>
+                        </div>
+                        <input class="calc-slider" type="range" min="2" max="15" value="8" id="s4" oninput="updateAct5Calc()">
+                        <div class="calc-slider-labels">
+                            <span>冷门赛道</span><span>中热赛道</span><span>高热赛道</span>
+                        </div>
+                    </div>
+                    <div class="calc-result" id="calcResult">
+                        <div>
+                            <div class="calc-result-label">综合得分</div>
+                            <div class="result-score-big" id="totalScore">43</div>
+                        </div>
+                        <div class="result-tier-badge" id="tierBadge">B 级</div>
+                        <div class="result-advice" id="tierAdvice">得分处于中等区间，具备一定授权基础，可关注引用与同族数据以提升综合评级。</div>
+                    </div>
+                </div>
+
+                <!-- 资产生命周期风险分布 -->
+                <div class="dashboard-card act5-card" style="grid-column:1/-1;">
+                    <h3>资产生命周期风险分布</h3>
+                    <div class="risk-timeline" id="riskTimeline"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="act-transition">
+            <p>价值分层之后，最后一个问题：技术本身，在向哪里演进？</p>
+            <span class="trans-arrow">↓</span>
+        </div>
+
+        <div id="narrativeAct6" class="narrative-section">
+            <div class="scene-header">
+                <span class="scene-num">SCENE 06</span>
+                <h2 class="scene-title">技术演进</h2>
+                <p class="scene-subtitle">从机械结构到智能感知，研究重心如何迁移</p>
+            </div>
+            <div class="act-intro">
+                同一批专利，按时间切片后，能看到技术关注点的<strong>漂移</strong>。早期的流量全部集中在机械手本体，近年的流量逐步向控制、视觉、智能、学习等方向<strong>扩散</strong>。中间的关键词层，是连接时间与<strong>技术赛道</strong>的桥梁。
+            </div>
+            <div class="story-text">
+                <p>把时间轴拉开，技术演进的脉络一目了然。<span class="story-data">2000-2010 年</span>是萌芽期，几乎所有研究都聚焦在机器人本体技术，没有明显分支。<span class="story-data">2011-2015 年</span>专利总量突破千件，控制和驱动方向开始冒头。<span class="story-data">2016 年</span>是真正的拐点——此后四年专利量激增至万件级，控制技术迅速成长为第二大方向。<span class="story-data">2020-2024 年</span>产业全面爆发，近五年总量超过前二十年总和的两倍，计算机视觉、机器学习等新兴赛道也开始崭露头角。</p>
+                <p>IPC 赛道排行中，B25J（机械手/工业机器人本体）以 <span class="story-data">4969 件</span>稳坐头把交椅，占所有专利近 70%，机械本体至今仍是产业的"压舱石"。但趋势已经很明显：从机械结构到电子控制，再到计算机视觉和人工智能，技术重心正在逐步迁移。计算机视觉、机器学习、柔性机器人这些前沿方向正在吸引越来越多的研发投入，机器人正在从单一的执行工具，向着更智能的协作系统演进。</p>
+                <div class="story-summary"><strong>小结：</strong>机械本体仍是产业“压舱石”，但智能化方向的增长势头已经遮不住。技术重心正在从机械驱动向电子控制迁移，智能驱动将是下一个主战场。</div>
+            </div>
+            <div class="dashboard-card act6-card">
+                <h3>技术演进桑基图（年份区间 → 研究主题 → IPC 赛道）</h3>
+                <div id="act6SankeyContainer" style="width:100%; height:700px; position:relative;">
+                    <svg id="act6SankeySvg" width="100%" height="100%"></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- 结语 -->
+        <div class="epilogue-wrapper">
+            <div class="epilogue-section">
+                <div class="epilogue-glass">
+                    <h2 class="epilogue-title">结语</h2>
+                    <p>从第一台工业机械臂到今天的人形机器人，专利数据记录了中国机器人产业三十余年的创新历程。7,364 件有效专利不仅是技术进步的见证，更是产业未来的指引。</p>
+                    <p>广东、上海、北京三大核心引领创新格局；技术路径实现了从机械结构到智能控制的跨越；产学研协同的创新生态已经成型；一批具有国际竞争力的高价值资产也在逐步壮大。</p>
+                    <p>面向未来，机器人技术正迎来前所未有的发展机遇。人工智能的快速发展为机器人注入了新的灵魂，制造业升级和消费升级创造了巨大的市场需求。在这场全球性的技术革命中，中国机器人产业正以更加自信的姿态，走向世界舞台的中央。</p>
+                    <div class="epilogue-closing">创新永无止境，让机器更像人的探索永远在路上。</div>
                 </div>
             </div>
         </div>
@@ -150,17 +489,15 @@
 
     <div id="globalTooltip" class="tooltip"></div>
 
-    <!-- 引入核心逻辑与各幕逻辑 -->
-    <!-- 1. 数据管道（包含 executeCoreDataPipeline、triggerSectionLazyRender 和 renderAllSectionsOnce） -->
-    <script src="js/data-pipeline.js"></script>
-    <!-- 2. 核心控制（包含文件上传和标签切换） -->
-    <script src="js/core.js"></script>
-    <!-- 3. 各幕渲染逻辑（每个文件包含对应的 renderActX 函数） -->
-    <script src="acts/act1/act1.js"></script>
-    <script src="acts/act2/act2.js"></script>
-    <script src="acts/act3/act3.js"></script>
-    <script src="acts/act4/act4.js"></script>
-    <script src="acts/act5/act5.js"></script>
+    <!-- 引入脚本 -->
+    <script src="js/data-pipeline.js?v=2"></script>
+    <script src="js/core.js?v=2"></script>
+    <script src="acts/act1/act1.js?v=2"></script>
+    <script src="acts/act2/act2.js?v=2"></script>
+    <script src="acts/act3/act3.js?v=2"></script>
+    <script src="acts/act4/act4.js?v=2"></script>
+    <script src="acts/act5/act5.js?v=2"></script>
+    <script src="acts/act6/act6.js?v=2"></script>
 </body>
 
 </html>

@@ -1,12 +1,24 @@
-/* Act 1: 全景仪表盘专属样式 */
+﻿/* Act 1 全景仪表盘样式 */
 
 .hub-spoke-grid {
     display: grid;
     grid-template-columns: 1fr 260px 1fr;
-    grid-template-rows: 270px 270px;
+    grid-template-rows: 340px 340px;
     gap: 16px;
     position: relative;
     z-index: 1;
+}
+
+/* 防止 SVG 撨大擑小撑爆 grid 列 */
+.hub-spoke-grid .dashboard-card {
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+.hub-spoke-grid .canvas-wrapper svg {
+    width: 100%;
+    height: 100%;
+    display: block;
 }
 
 .hub-central-core {
@@ -16,14 +28,14 @@
     justify-self: center;
     width: 240px;
     height: 240px;
-    background: #ffffff;
+    background: transparent;
     border: 2px solid var(--cyan-accent);
     border-radius: 50%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 2px 12px rgba(2, 132, 199, 0.1);
+    box-shadow: none;
     z-index: 10;
     text-align: center;
     position: relative;
@@ -32,15 +44,15 @@
 }
 
 .hub-central-core>span:first-child {
-    font-size: 11px;
+    font-size: 17px;
 }
 
 .hub-central-core #metricTotalCount {
-    font-size: 26px;
+    font-size: 39px;
     line-height: 1.2;
 }
 
 .hub-central-core #metricSubDateRange {
-    font-size: 9px;
+    font-size: 14px;
     white-space: nowrap;
 }

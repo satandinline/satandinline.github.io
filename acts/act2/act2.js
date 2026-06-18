@@ -1,4 +1,4 @@
-// Act 2: 区域空间格局专属交互逻辑 (ECharts 地图热力图)
+// Act 2 区域空间格局 - ECharts 地图热力图
 
 let echartsMapInstance = null;
 
@@ -6,25 +6,23 @@ function renderAct2() {
     const container = document.getElementById('echartsChinaMap');
     if (!container) return;
 
-    // 初始化或复用 ECharts 实例
+    // 初始化 ECharts 实例
     if (echartsMapInstance) {
         echartsMapInstance.dispose();
     }
     echartsMapInstance = echarts.init(container);
 
-    // 从 globalProcessedMetrics 获取省份专利数量
+    // 获取省份专利数
     const provinceRanking = globalProcessedMetrics.provinceRanking || {};
 
-    // 构建 ECharts 地图数据：遍历省份排名，生成 {name, value} 数组
-    // ECharts china.js 地图的省份名称为简称（北京、上海、广东...），与 provinceRanking 的 key 一致
+    // 构建地图数据，省份名称和 china.js 地图简称一致
     const mapData = Object.entries(provinceRanking).map(([name, value]) => ({
         name: name,
         value: value
     }));
 
-    // 计算最大值和最小值用于 visualMap
-    const counts = Object.values(provinceRanking);
-    const maxVal = counts.length > 0 ? Math.max(...counts) : 100;
+    // 图例最大值固定为 2000，便于跨时间切片对比
+    const maxVal = 2000;
     const minVal = 0;
 
     const option = {
@@ -47,7 +45,7 @@ function renderAct2() {
             padding: 5
         },
 
-        // 视觉映射组件（颜色比例尺）
+        // 颜色比例尺
         visualMap: {
             show: true,
             type: 'continuous',
@@ -67,25 +65,25 @@ function renderAct2() {
             textStyle: { color: '#333' }
         },
 
-        // 系列配置
+        // 地图系列
         series: [{
             type: 'map',
             name: '专利数量',
             mapType: 'china',
-            roam: true,           // 允许缩放和拖拽
+            roam: 'move',  // 只允许拖拽平移，禁用滚轮缩放（缩放交给浏览器页面缩放）
             aspectScale: 0.75,
             selectedMode: false,
-            zoom: 1,
+            zoom: 1.25,
             label: {
                 show: true,
                 position: 'top',
-                fontSize: 9,
+                fontSize: 10,
                 color: '#666'
             },
             emphasis: {
                 label: {
                     show: true,
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: 'bold',
                     color: '#333'
                 },
@@ -105,7 +103,12 @@ function renderAct2() {
 
     echartsMapInstance.setOption(option);
 
-    // 窗口大小变化时自动调整图表尺寸
+    // 确保 ECharts 容器不拦截滚轮事件，让页面正常滚动
+    container.addEventListener('wheel', function(e) {
+        e.stopPropagation();
+    }, true);
+
+    // 窗口缩放时自适应
     window.addEventListener('resize', () => {
         if (echartsMapInstance) echartsMapInstance.resize();
     });

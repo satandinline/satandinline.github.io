@@ -1,4 +1,4 @@
-// 核心数据管道处理逻辑 (executeCoreDataPipeline)
+// 数据管道：从 patent.csv 原始数据提取各类统计指标
 
 function executeCoreDataPipeline() {
     try {
@@ -9,7 +9,10 @@ function executeCoreDataPipeline() {
             techThemeClustering: {}, assigneeRanking: {},
             techCoOccurrenceMatrix: {}, assigneeCoMatrix: {},
             valueScoreDistribution: { high: 0, mid: 0, low: 0 },
-            riskDistribution: { expired: 0, critical: 0, normal: 0 }
+            riskDistribution: { expired: 0, critical: 0, normal: 0 },
+            // 桑基图流转数据：年份区间 → 研究主题 → IPC赛道
+            sankeyPeriodTopic: {},    // { "2016-2019|视觉": 42, ... }
+            sankeyTopicIpc: {}        // { "视觉|G06T": 30, ... }
         };
         assigneeTechFocus = {};
 
@@ -27,7 +30,7 @@ function executeCoreDataPipeline() {
                 if (year > globalProcessedMetrics.maxYear && year <= 2026) globalProcessedMetrics.maxYear = year;
             }
 
-            // 2. 状态大类合并归并
+            // 2. 法律状态归类
             let cleanStatus = '审查';
             let rawStatus = row['法律状态/事件'] || '';
             let pType = row['专利类型'] || '';
@@ -36,7 +39,7 @@ function executeCoreDataPipeline() {
             else if (rawStatus.includes('失效') || rawStatus.includes('放弃') || rawStatus.includes('到期')) cleanStatus = '失效/放弃';
             globalProcessedMetrics.legalStatusStats[cleanStatus]++;
 
-            // 3. 全球确权受理局
+            // 3. 受理局统计
             let auth = (row['受理局'] || 'CN').substring(0, 2).toUpperCase();
             globalProcessedMetrics.globalRanking[auth] = (globalProcessedMetrics.globalRanking[auth] || 0) + 1;
 
@@ -93,7 +96,7 @@ function executeCoreDataPipeline() {
                 }
             }
 
-            // 6. 主体研发名录排行提取
+            // 6. 申请人排名统计
             let rawAssignee = row['当前申请(专利权)人'] || row['原始申请(专利权)人'] || '';
             if (rawAssignee && rawAssignee !== '-') {
                 let firstAssignee = rawAssignee.split('|')[0].split(';')[0].trim();
@@ -122,7 +125,7 @@ function executeCoreDataPipeline() {
                 globalProcessedMetrics.valueScoreDistribution.low++;
             }
 
-            // 8. 到期风险分布解算
+            // 8. 到期风险分布
             let expiryStr = row['预估到期日'] || '';
             if (expiryStr && expiryStr.length >= 4) {
                 let expYear = parseInt(expiryStr.substring(0, 4));
@@ -133,9 +136,38 @@ function executeCoreDataPipeline() {
                 if (cleanStatus === '失效/放弃' || cleanStatus === '驳回/撤回') globalProcessedMetrics.riskDistribution.expired++;
                 else globalProcessedMetrics.riskDistribution.normal++;
             }
+
+            // 9. 桑基图流转统计（年份区间 → 研究主题 → IPC赛道）
+            // 从标题提取研究主题关键词
+            const SK_KW = ['机械手','机器人','控制','视觉','传感','移动','自动','检测','驱动','路径规划','夹持','焊接','导航','仿生','协同','力反馈','图像','抓取','行走','柔性','学习','智能','定位','识别'];
+            let rawTitle = title || '';
+            let foundKw = [];
+            for (let ki = 0; ki < SK_KW.length; ki++) {
+                if (rawTitle.includes(SK_KW[ki])) foundKw.push(SK_KW[ki]);
+            }
+            if (foundKw.length === 0) foundKw = ['其他'];
+            // 年份区间分组
+            let sYear = appDateStr ? parseInt(appDateStr.substring(0, 4)) : 0;
+            let period = '';
+            if (sYear >= 2000 && sYear <= 2010) period = '2000-2010';
+            else if (sYear >= 2011 && sYear <= 2015) period = '2011-2015';
+            else if (sYear >= 2016 && sYear <= 2019) period = '2016-2019';
+            else if (sYear >= 2020 && sYear <= 2026) period = '2020-2024';
+            // IPC 小类作为赛道维度
+            let ipcCat = row['IPC主分类号(小类)'] || '';
+            if (ipcCat && ipcCat !== '-') ipcCat = ipcCat.trim();
+            else ipcCat = ipcs[0] ? ipcs[0].substring(0, 4) : '';
+            if (period && ipcCat) {
+                foundKw.forEach(kw => {
+                    let ptKey = period + '|' + kw;
+                    globalProcessedMetrics.sankeyPeriodTopic[ptKey] = (globalProcessedMetrics.sankeyPeriodTopic[ptKey] || 0) + 1;
+                    let tiKey = kw + '|' + ipcCat;
+                    globalProcessedMetrics.sankeyTopicIpc[tiKey] = (globalProcessedMetrics.sankeyTopicIpc[tiKey] || 0) + 1;
+                });
+            }
         });
 
-        // 计算强竞争性对抗连线
+        // 计算头部企业之间的竞争连线
         let topCompanies = Object.entries(globalProcessedMetrics.assigneeRanking).sort((a, b) => b[1] - a[1]).slice(0, 20).map(x => x[0]);
         for (let i = 0; i < topCompanies.length; i++) {
             for (let j = i + 1; j < topCompanies.length; j++) {
@@ -148,60 +180,40 @@ function executeCoreDataPipeline() {
             }
         }
 
-        // 呈现主视图并隐藏加载信息
-        document.getElementById('mainDashboardView').style.display = 'block';
+        // 用 type.csv 的技术分类标注覆盖 IPC 推断的 techThemeClustering
+        if (rawTypeCsvData && rawTypeCsvData.length > 0) {
+            const techCols = Object.keys(rawTypeCsvData[0]).filter(k => k !== 'id' && k !== 'publication_no');
+            const typeCounts = {};
+            techCols.forEach(col => { typeCounts[col] = 0; });
+            rawTypeCsvData.forEach(row => {
+                techCols.forEach(col => {
+                    if (parseInt(row[col]) === 1) typeCounts[col]++;
+                });
+            });
+            globalProcessedMetrics.techThemeClustering = typeCounts;
+            console.log('已用 type.csv 覆盖技术主题聚类，分类数：', techCols.length);
+        }
+
+        // 隐藏加载提示
         document.getElementById('globalLoadingNotice').style.display = 'none';
 
         console.log(`数据管道执行完成：共处理 ${globalProcessedMetrics.totalCount} 条专利记录`);
 
-        // 全量预渲染：依次调用所有 5 个幕的渲染函数
-        // 注意：由于某些幕处于 display:none 状态，我们需要临时显示它们以便 Chart.js/D3 能正确计算尺寸
-        renderAllSectionsOnce();
+        // 所有幕始终可见，直接渲染
+        if (typeof renderAct1 === 'function') renderAct1();
+        if (typeof renderAct2 === 'function') renderAct2();
+        if (typeof renderAct3 === 'function') renderAct3();
+        if (typeof renderAct4 === 'function') renderAct4();
+        if (typeof renderAct5 === 'function') renderAct5();
+        if (typeof renderAct6 === 'function') renderAct6();
 
-        // 默认显示第一幕
-        switchNarrativeAct(1);
+        // 初始化滚动监听，高亮当前幕的标签
+        initScrollSpy();
+        // 初始化导航栏交互隐藏
+        initNavbarAutoHide();
     } catch (err) {
         console.error(err);
         alert("执行矩阵解析时发生内部错误: " + err.message);
         document.getElementById('globalLoadingNotice').style.display = 'none';
     }
-}
-
-// 全量渲染所有幕的辅助函数（处理 display:none 导致的尺寸问题）
-function renderAllSectionsOnce() {
-    const sections = document.querySelectorAll('.narrative-section');
-
-    // 临时显示所有 section 以便获取正确的容器尺寸
-    sections.forEach(section => {
-        section.style.display = 'block';
-        section.classList.add('active');
-    });
-
-    // 强制浏览器重新计算布局
-    document.body.offsetHeight;
-
-    // 依次渲染所有幕
-    if (typeof renderAct1 === 'function') renderAct1();
-    if (typeof renderAct2 === 'function') renderAct2();
-    if (typeof renderAct3 === 'function') renderAct3();
-    if (typeof renderAct4 === 'function') renderAct4();
-    if (typeof renderAct5 === 'function') renderAct5();
-
-    // 恢复原始状态（仅第一幕可见）
-    sections.forEach((section, index) => {
-        section.classList.remove('active');
-        section.style.display = '';
-        if (index === 0) {
-            section.classList.add('active');
-        }
-    });
-}
-
-// 全局懒加载触发器：根据 actId 调用对应幕的渲染函数
-function triggerSectionLazyRender(actId) {
-    if (actId === 1 && typeof renderAct1 === 'function') renderAct1();
-    if (actId === 2 && typeof renderAct2 === 'function') renderAct2();
-    if (actId === 3 && typeof renderAct3 === 'function') renderAct3();
-    if (actId === 4 && typeof renderAct4 === 'function') renderAct4();
-    if (actId === 5 && typeof renderAct5 === 'function') renderAct5();
 }
